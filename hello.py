@@ -15,7 +15,7 @@
 import streamlit as st
 
 st.set_page_config(page_title="Hello", page_icon=":material/waving_hand:")
-st.title("Welcome to Streamlit! 👋")
+st.title("声学仿真 APP")
 st.write(
     """
     Streamlit is an open-source app framework built specifically for
