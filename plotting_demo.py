@@ -46,6 +46,14 @@ def plotting_curve() -> None:
         5 seconds. Enjoy!
         """
     )
+    df = st.DataFrame(
+        [
+            {"Label": "1#", "振膜顺性": 1.85, "声孔惯性": 40},
+        ]
+    )
+    # para = st.data_edt
+
+    
     st.pyplot(fig)
 
 # 正文
