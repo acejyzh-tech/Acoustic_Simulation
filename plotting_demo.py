@@ -17,28 +17,33 @@ import numpy as np
 import streamlit as st
 from streamlit.hello.utils import show_code
 import matplotlib.pyplot as plt
+import JYAcoustic as ac
 
 def plotting_demo() -> None:
-    fc = st.sidebar.slider("低衰截止频率（Hz）", 10.0, 500.0, 20.0, 1.0)
-    f = np.logspace(1, 5, 500)  # 从 0.1Hz 到 100Hz
+    fo = st.sidebar.slider("低衰截止频率（Hz）", 10.0, 500.0, 20.0, 1.0)
+    freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
     
-    # 计算一阶高通滤波器幅值响应（归一化为分贝）
-    H = f / np.sqrt(f**2 + fc**2)
-    H_dB = 20 * np.log10(H)
-    
+    mic1 = ac.MIC()   # 定义MIC类mic1
+    sens, N_AH, N_VH, N_BH, N_total = [], [], [], [], []  # 初始化数组
+    # 计算
+    for f in freqs:
+        sens.append(mic1.Sens(f))
+        N_AH.append(mic1.N_AH(f))
+        N_VH.append(mic1.N_VH(f))
+        N_BH.append(mic1.N_BH(f))
+        N_total.append(mic1.N_total(f))
     # 绘制图形
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.semilogx(f, H_dB, label="幅值响应")  # 对数频率轴
-    ax.set_title("一阶高通滤波器幅值响应")
-    ax.set_xlabel("频率 (Hz)")
-    ax.set_ylabel("幅值 (dB)")
-    ax.grid(True, which="both", linestyle="--", linewidth=0.5)
-    ax.legend()
-    
+    plt.figure(figsize=(8,6))
+    ax = plt.subplot()
+    ax.semilogx(freqs, dB(sens), '-k', label='Sensitivity') 
+    ax.semilogx(freqs, dB(N_AH), '-C0', label='Acoustic Inlet')
+    ax.semilogx(freqs, dB(N_VH), '-C1', label='Vent Hole')
+    ax.semilogx(freqs, dB(N_BH), '-C2', label='Backplete Hole')
+    ax.semilogx(freqs, dB(N_total), '-k', label='Total Noise')
+    ax.grid()
+    ax.legend(loc='best')
     # 显示图形
     st.pyplot(fig)
-
-
 
 st.set_page_config(page_title="Plotting demo", page_icon=":material/show_chart:")
 st.title("Plotting demo")
