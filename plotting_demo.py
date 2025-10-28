@@ -47,32 +47,18 @@ def plotting_curve() -> None:
         5 seconds. Enjoy!
         """
     )
-    df = pd.DataFrame(
-        [
-            {"Label": "1#", "振膜顺性": 1.85, "声孔惯性": 40},
-        ]
-    )
-    para = st.table(df)
-
-    st.markdown(f"DF is **{para}**")
-
-
-    
-
-    st.table(
-        pd.DataFrame(
-            {
-                "Frequency (Hz)": freqs,
-                "Sensitivity (dB)": ac.dB(sens),
-                "Acoustic Inlet Noise (dB)": ac.dB(N_AH),
-                "Vent Hole (dB)": ac.dB(N_VH),
-                "Backplete Hole (dB)": ac.dB(N_BH),
-                "Total Noise (dB)": ac.dB(N_total),
-            }
+    with st.spinner("Wait for it...", show_time=True):
+        df = pd.DataFrame(
+            [
+                {"Label": "1#", "振膜顺性": 1.85, "声孔惯性": 40},
+            ]
         )
-    )
+        para = st.dataframe(df)
     
-    st.pyplot(fig)
+        st.markdown(f"DF is **{para}**")
+    
+        
+        st.pyplot(fig)
 
 # 正文
 plotting_curve()
