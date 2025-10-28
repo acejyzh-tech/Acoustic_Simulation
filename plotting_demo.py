@@ -59,10 +59,11 @@ def plotting_curve() -> None:
 
     
 
-    st.write(
+    st.table(
         pd.DataFrame(
             {
                 "Frequency (Hz)": freqs,
+                "Sensitivity (dB)": ac.db(sens),
             }
         )
     )
