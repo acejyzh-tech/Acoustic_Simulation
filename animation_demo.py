@@ -27,14 +27,7 @@ def animation_demo() -> None:
     
 
 st.set_page_config(page_title="Animation demo", page_icon=":material/animation:")
-st.title("Animation demo")
-st.write(
-    """
-    This app shows how you can use Streamlit to build cool animations.
-    It displays an animated fractal based on the Julia Set. Use the slider
-    to tune different parameters.
-    """
-)
+
 
 
 
