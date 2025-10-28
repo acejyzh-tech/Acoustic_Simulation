@@ -18,28 +18,35 @@ import numpy as np
 
 import streamlit as st
 from streamlit.hello.utils import show_code
+import matplotlib.pyplot as plt
+
 
 
 def plotting_demo() -> None:
-    progress_bar = st.sidebar.progress(0)
-    status_text = st.sidebar.empty()
-    last_rows = np.random.randn(1, 1)  # noqa: NPY002
-    chart = st.line_chart(last_rows)
 
-    for i in range(1, 101):
-        new_rows = last_rows[-1, :] + np.random.randn(5, 1).cumsum(axis=0)  # noqa: NPY002
-        status_text.text(f"{i}% complete")
-        chart.add_rows(new_rows)
-        progress_bar.progress(i)
-        last_rows = new_rows
-        time.sleep(0.05)
+    
+    # 添加交互控件：截止频率滑块
+    fc = st.sidebar.slider("截止频率（Hz）", 0.1, 100.0, 1.0, 0.1)
+    
+    # 生成频率数据（对数刻度）
+    f = np.logspace(-1, 2, 500)  # 从 0.1Hz 到 100Hz
+    
+    # 计算一阶高通滤波器幅值响应（归一化为分贝）
+    H = f / np.sqrt(f**2 + fc**2)
+    H_dB = 20 * np.log10(H)
+    
+    # 绘制图形
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.semilogx(f, H_dB, label="幅值响应")  # 对数频率轴
+    ax.set_title("一阶高通滤波器幅值响应")
+    ax.set_xlabel("频率 (Hz)")
+    ax.set_ylabel("幅值 (dB)")
+    ax.grid(True, which="both", linestyle="--", linewidth=0.5)
+    ax.legend()
+    
+    # 显示图形
+    st.pyplot(fig)
 
-    progress_bar.empty()
-
-    # Streamlit widgets automatically run the script from top to bottom. Since
-    # this button is not connected to any other logic, it just causes a plain
-    # rerun.
-    st.button("Rerun")
 
 
 st.set_page_config(page_title="Plotting demo", page_icon=":material/show_chart:")
