@@ -47,7 +47,6 @@ def plotting_curve() -> None:
         """
     )
     st.pyplot(fig)
-)
 
 # 正文
 plotting_curve()
