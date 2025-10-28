@@ -56,7 +56,6 @@ def handle_selection():
     st.session_state['data_editor'] = updated_df
 
 # 显示 data_editor
-st.write("### 使用 data_editor 的单选表格")
 df_editor = st.data_editor(
     st.session_state['data_editor'],
     column_config=column_config,
