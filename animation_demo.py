@@ -20,54 +20,46 @@ import streamlit as st
 import pandas as pd
 
 
+import streamlit as st
+import pandas as pd
 
-# 设置页面标题（中文）
-st.title("DataFrame 单选交互示例")
+# 初始化 session_state
+if 'selected_row' not in st.session_state:
+    st.session_state['selected_row'] = None
 
-# 创建示例数据
+# 示例数据
 data = {
-    "姓名": ["张三", "李四", "王五", "赵六"],
-    "年龄": [28, 32, 25, 30],
-    "城市": ["北京", "上海", "广州", "深圳"]
+    '名称': ['项目A', '项目B', '项目C'],
+    '数量': [10, 20, 30]
 }
 df = pd.DataFrame(data)
 
-# 初始化会话状态
-if 'selected_index' not in st.session_state:
-    st.session_state.selected_index = None
+# 显示表格
+st.write("### 交互式表格（单选框）")
 
-# 自定义行样式函数
-def highlight_row(row):
-    return ['background-color: yellow' if i == st.session_state.selected_index else '' for i in range(len(df))]
+# 遍历每一行，生成单选框
+for index, row in df.iterrows():
+    # 检查当前行是否被选中
+    is_selected = (index == st.session_state['selected_row'])
+    
+    # 创建单选框
+    selected = st.checkbox(f"选择 {row['名称']}", key=index, value=is_selected)
+    
+    # 处理选中逻辑
+    if selected:
+        # 如果当前行被选中，更新 session_state
+        st.session_state['selected_row'] = index
+    elif is_selected:
+        # 如果之前选中，现在取消
+        st.session_state['selected_row'] = None
 
-# 显示数据编辑器
-edited_df = st.data_editor(
-    df,
-    hide_index=True,
-    column_config={
-        "选择": st.column_config.CheckboxColumn("选择", help="点击选择该行"),
-    },
-    on_change=lambda: st.session_state.update(
-        selected_index=edited_df.index[edited_df['选择']].iloc[0] if not edited_df['选择'].isna().all() else None
-    ),
-    kwargs={"use_container_width": True}
-)
-
-# 显示选中行数据
-if st.session_state.selected_index is not None:
-    selected_row = df.iloc[st.session_state.selected_index]
-    st.success("您选中了以下数据：")
-    st.dataframe(
-        selected_row.to_frame().T,
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "姓名": st.column_config.TextColumn("姓名"),
-            "年龄": st.column_config.NumberColumn("年龄"),
-            "城市": st.column_config.TextColumn("城市")
-        }
-    )
+# 显示选中的行信息
+if st.session_state['selected_row'] is not None:
+    st.success("当前选中行：")
+    st.dataframe(df.iloc[st.session_state['selected_row']].to_frame().T)
 else:
-    st.info("请从表格中选择一行进行查看")
+    st.info("请选择一行")
+
+
 
 # animation_demo()
