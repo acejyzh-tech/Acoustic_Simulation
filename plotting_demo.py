@@ -52,7 +52,7 @@ def plotting_curve() -> None:
             {"Label": "1#", "振膜顺性": 1.85, "声孔惯性": 40},
         ]
     )
-    para = st.data_editor(df)
+    para = st.data_editor(df, num_rows="dynamic")
 
     st.markdown(f"DF is **{para}**")
 
