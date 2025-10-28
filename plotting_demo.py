@@ -20,11 +20,15 @@ import matplotlib.pyplot as plt
 import JYAcoustic as ac
 
 def plotting_demo() -> None:
-    R_AH = st.sidebar.slider("低衰截止频率（Hz）", 10.0, 500.0, 110.0, 1.0)
     freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
-    
+    C_SD = st.sidebar.slider("振膜顺性（fF）", 1.0, 4.0, 1.85, 0.05)
+    R_AH = st.sidebar.slider("声孔声阻（Mo）", 10.0, 500.0, 110.0, 1.0)
+    M_AH = st.sidebar.slider("声孔惯性（KH）", 10.0, 200.0, 40.0, 5.0)
+
     mic1 = ac.MIC()   # 定义MIC类mic1
+    mic1.SD.C = C_SD * 1e-15
     mic1.AH.R = R_AH * 1e6
+    mic1.AH.M = M_AH * 1e3
     sens, N_AH, N_VH, N_BH, N_total = [], [], [], [], []  # 初始化数组
     # 计算
     for f in freqs:
