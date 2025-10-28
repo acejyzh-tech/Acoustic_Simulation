@@ -24,6 +24,7 @@ def plotting_curve() -> None:
         N_VH.append(mic1.N_VH(f))
         N_BH.append(mic1.N_BH(f))
         N_total.append(mic1.N_total(f))
+        
     # 绘制图形
     fig = plt.figure(figsize=(8,6))
     ax = plt.subplot()
@@ -34,17 +35,18 @@ def plotting_curve() -> None:
     ax.semilogx(freqs, ac.dB(N_total), '-k', label='Total Noise')
     ax.grid()
     ax.legend(loc='best')
+    
     # 显示图形
+    st.set_page_config(page_title="Plotting demo", page_icon=":material/show_chart:")
+    st.title("Plotting demo")
+    st.write(
+        """
+        This demo illustrates a combination of plotting and animation with
+        Streamlit. We're generating a bunch of random numbers in a loop for around
+        5 seconds. Enjoy!
+        """
     st.pyplot(fig)
 )
 
 # 正文
-st.set_page_config(page_title="Plotting demo", page_icon=":material/show_chart:")
-st.title("Plotting demo")
-st.write(
-    """
-    This demo illustrates a combination of plotting and animation with
-    Streamlit. We're generating a bunch of random numbers in a loop for around
-    5 seconds. Enjoy!
-    """
 plotting_curve()
