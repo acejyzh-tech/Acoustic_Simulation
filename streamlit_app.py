@@ -24,26 +24,11 @@ dir_path = Path(__file__).parent
 def run() -> None:
     page = st.navigation(
         {
-            "pa": [
+            "JYZhang 的声学工具箱": [
                 st.Page(
                     dir_path / "plotting_demo.py",
                     title="由低衰和谐振峰点生成麦克风频响曲线",
                     icon=":material/show_chart:",
-                ),
-                st.Page(
-                    dir_path / "dataframe_demo.py",
-                    title="DataFrame demo",
-                    icon=":material/table:",
-                ),
-                st.Page(
-                    dir_path / "mapping_demo.py",
-                    title="Mapping demo",
-                    icon=":material/public:",
-                ),
-                st.Page(
-                    dir_path / "animation_demo.py",
-                    title="Animation demo",
-                    icon=":material/animation:",
                 ),
             ]
         }
