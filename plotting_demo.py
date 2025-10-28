@@ -1,6 +1,7 @@
 # Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
 import time
 import numpy as np
+import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 import JYAcoustic as ac
@@ -46,7 +47,7 @@ def plotting_curve() -> None:
         5 seconds. Enjoy!
         """
     )
-    df = st.DataFrame(
+    df = pd.DataFrame(
         [
             {"Label": "1#", "振膜顺性": 1.85, "声孔惯性": 40},
         ]
