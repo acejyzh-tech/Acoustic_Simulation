@@ -9,9 +9,9 @@ import JYAcoustic as ac
 def plotting_curve() -> None:
     freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
     # 侧边参数输入栏
-    C_SD = st.sidebar.slider("振膜顺性（fF）", 1.0, 4.0, 1.85, 0.05)
-    R_AH = st.sidebar.slider("声孔声阻（Mo）", 10.0, 500.0, 110.0, 1.0)
-    M_AH = st.sidebar.slider("声孔惯性（KH）", 10.0, 200.0, 40.0, 5.0)
+    C_SD = st.sidebar.number_input("振膜顺性（fF）", 1.0, 4.0, 1.85, 0.05)
+    R_AH = st.sidebar.number_input("声孔声阻（Mo）", 10.0, 500.0, 110.0, 1.0)
+    M_AH = st.sidebar.number_input("声孔惯性（KH）", 10.0, 200.0, 40.0, 5.0)
 
     mic1 = ac.MIC()   # 定义MIC类mic1
     mic1.SD.C = C_SD * 1e-15
