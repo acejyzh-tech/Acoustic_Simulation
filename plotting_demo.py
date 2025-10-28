@@ -56,6 +56,16 @@ def plotting_curve() -> None:
 
     st.markdown(f"DF is **{para}**")
 
+
+    
+
+    st.write(
+        pd.DataFrame(
+            {
+                "Frequency (Hz)": freqs,
+            }
+        )
+    )
     
     st.pyplot(fig)
 
