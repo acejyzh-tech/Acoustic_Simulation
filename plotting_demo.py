@@ -63,7 +63,11 @@ def plotting_curve() -> None:
         pd.DataFrame(
             {
                 "Frequency (Hz)": freqs,
-                "Sensitivity (dB)": ac.db(sens),
+                "Sensitivity (dB)": ac.dB(sens),
+                "Acoustic Inlet Noise (dB)": ac.dB(N_AH),
+                "Vent Hole (dB)": ac.dB(N_VH),
+                "Backplete Hole (dB)": ac.dB(N_BH),
+                "Total Noise (dB)": ac.dB(N_total),
             }
         )
     )
