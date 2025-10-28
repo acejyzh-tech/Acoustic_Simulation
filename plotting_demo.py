@@ -33,7 +33,7 @@ def plotting_demo() -> None:
         N_BH.append(mic1.N_BH(f))
         N_total.append(mic1.N_total(f))
     # 绘制图形
-    plt.figure(figsize=(8,6))
+    fig = plt.figure(figsize=(8,6))
     ax = plt.subplot()
     ax.semilogx(freqs, ac.dB(sens), '-k', label='Sensitivity') 
     ax.semilogx(freqs, ac.dB(N_AH), '-C0', label='Acoustic Inlet')
