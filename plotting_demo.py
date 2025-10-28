@@ -20,10 +20,11 @@ import matplotlib.pyplot as plt
 import JYAcoustic as ac
 
 def plotting_demo() -> None:
-    fo = st.sidebar.slider("低衰截止频率（Hz）", 10.0, 500.0, 20.0, 1.0)
+    R_AH = st.sidebar.slider("低衰截止频率（Hz）", 10.0, 500.0, 110.0, 1.0)
     freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
     
     mic1 = ac.MIC()   # 定义MIC类mic1
+    mic1.AH.R = R_AH * 1e6
     sens, N_AH, N_VH, N_BH, N_total = [], [], [], [], []  # 初始化数组
     # 计算
     for f in freqs:
