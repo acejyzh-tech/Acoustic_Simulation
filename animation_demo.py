@@ -20,52 +20,25 @@ import streamlit as st
 import pandas as pd
 
 
-# 初始化 session_state
-if 'selected_row' not in st.session_state:
-    st.session_state['selected_row'] = None
-if 'data_editor' not in st.session_state:
-    st.session_state['data_editor'] = pd.DataFrame({
-        '名称': ['项目A', '项目B', '项目C'],
-        '数量': [10, 20, 30],
-        '选择': [False, False, False]
-    })
+# 示例数字
+number = 123456
 
-# 定义列配置
-column_config = {
-    '名称': st.column_config.TextColumn("名称", help="项目名称"),
-    '数量': st.column_config.NumberColumn("数量", help="项目数量"),
-    '选择': st.column_config.CheckboxColumn("选择", help="选择此行")
-}
-
-# 回调函数处理选中逻辑
-def handle_selection():
-    # 获取当前数据框
-    updated_df = st.session_state['data_editor'].copy()
-    # 找到所有选中的行
-    selected_rows = updated_df[updated_df['选择']]
-    if not selected_rows.empty:
-        # 如果有多个选中行，只保留最后一个
-        if len(selected_rows) > 1:
-            # 将其他行的“选择”设为False
-            updated_df.loc[updated_df.index != selected_rows.index[-1], '选择'] = False
-        # 更新 session_state 中的选中行
-        st.session_state['selected_row'] = selected_rows.index[-1]
-    else:
-        st.session_state['selected_row'] = None
-    # 更新 session_state 中的数据框
-    st.session_state['data_editor'] = updated_df
-
-# 显示 data_editor
-df_editor = st.data_editor(
-    st.session_state['data_editor'],
-    column_config=column_config,
-    on_change=handle_selection,
-    key="data_editor"
+# 使用 HTML + JavaScript 实现复制功能
+st.markdown(
+    f"""
+    <script>
+    function copyToClipboard(text) {{
+        navigator.clipboard.writeText(text).then(function() {{
+            alert('已复制到剪贴板: ' + text);
+        }}, function(err) {{
+            alert('复制失败: ' + err);
+        }});
+    }}
+    </script>
+    <div style="cursor: pointer; display: inline-block; padding: 8px; background: #f0f0f0; border-radius: 4px;" 
+         onclick="copyToClipboard('{number}')">
+        {number}
+    </div>
+    """,
+    unsafe_allow_html=True
 )
-
-# 显示选中的行信息
-if st.session_state['selected_row'] is not None:
-    st.success("当前选中行：")
-    st.dataframe(st.session_state['data_editor'].iloc[st.session_state['selected_row']].to_frame().T)
-else:
-    st.info("请选择一行")
