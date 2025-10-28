@@ -21,16 +21,6 @@ import pandas as pd
 
 
 
-def animation_demo() -> None:
-    # Interactive Streamlit elements, like these sliders, return their value.
-    # This gives you an extremely simple interaction model.
-    
-
-st.set_page_config(page_title="Animation demo", page_icon=":material/animation:")
-
-
-
-
 # 设置页面标题（中文）
 st.title("DataFrame 单选交互示例")
 
