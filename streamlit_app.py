@@ -30,6 +30,11 @@ def run() -> None:
                     title="由低衰和谐振峰点生成麦克风频响曲线",
                     icon=":material/show_chart:",
                 ),
+                st.Page(
+                    dir_path / "plotting_demo.py",
+                    title="由低衰和谐振峰点生成麦克风频响曲线",
+                    icon=":material/show_chart:",
+                ),
             ]
         }
     )
