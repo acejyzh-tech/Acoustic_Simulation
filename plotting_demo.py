@@ -13,23 +13,14 @@
 # limitations under the License.
 
 import time
-
 import numpy as np
-
 import streamlit as st
 from streamlit.hello.utils import show_code
 import matplotlib.pyplot as plt
 
-
-
 def plotting_demo() -> None:
-
-    
-    # 添加交互控件：截止频率滑块
-    fc = st.sidebar.slider("截止频率（Hz）", 0.1, 100.0, 1.0, 0.1)
-    
-    # 生成频率数据（对数刻度）
-    f = np.logspace(-1, 2, 500)  # 从 0.1Hz 到 100Hz
+    fc = st.sidebar.slider("低衰截止频率（Hz）", 10.0, 500.0, 20.0, 1.0)
+    f = np.logspace(1, 5, 500)  # 从 0.1Hz 到 100Hz
     
     # 计算一阶高通滤波器幅值响应（归一化为分贝）
     H = f / np.sqrt(f**2 + fc**2)
@@ -59,4 +50,4 @@ st.write(
     """
 )
 plotting_demo()
-show_code(plotting_demo)
+# show_code(plotting_demo) # 显示源代码
