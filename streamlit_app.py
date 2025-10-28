@@ -24,7 +24,7 @@ dir_path = Path(__file__).parent
 def run() -> None:
     page = st.navigation(
         {
-            "JYZhang 的声学工具箱": [
+            "pa": [
                 st.Page(
                     dir_path / "plotting_demo.py",
                     title="由低衰和谐振峰点生成麦克风频响曲线",
