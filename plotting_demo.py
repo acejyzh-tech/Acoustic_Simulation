@@ -35,11 +35,11 @@ def plotting_demo() -> None:
     # 绘制图形
     plt.figure(figsize=(8,6))
     ax = plt.subplot()
-    ax.semilogx(freqs, dB(sens), '-k', label='Sensitivity') 
-    ax.semilogx(freqs, dB(N_AH), '-C0', label='Acoustic Inlet')
-    ax.semilogx(freqs, dB(N_VH), '-C1', label='Vent Hole')
-    ax.semilogx(freqs, dB(N_BH), '-C2', label='Backplete Hole')
-    ax.semilogx(freqs, dB(N_total), '-k', label='Total Noise')
+    ax.semilogx(freqs, ac.dB(sens), '-k', label='Sensitivity') 
+    ax.semilogx(freqs, ac.dB(N_AH), '-C0', label='Acoustic Inlet')
+    ax.semilogx(freqs, ac.dB(N_VH), '-C1', label='Vent Hole')
+    ax.semilogx(freqs, ac.dB(N_BH), '-C2', label='Backplete Hole')
+    ax.semilogx(freqs, ac.dB(N_total), '-k', label='Total Noise')
     ax.grid()
     ax.legend(loc='best')
     # 显示图形
