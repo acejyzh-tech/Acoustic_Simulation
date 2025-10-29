@@ -47,10 +47,7 @@ def plotting_curve() -> None:
         5 seconds. Enjoy!
         """
     )
-
-    
-        
-        st.pyplot(fig)
+    st.pyplot(fig)
 
 # 正文
 plotting_curve()
