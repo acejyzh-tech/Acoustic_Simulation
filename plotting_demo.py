@@ -38,16 +38,17 @@ def plotting_curve() -> None:
     ax.legend(loc='best')
     
     # 显示图形
-    st.set_page_config(page_title="Plotting demo", page_icon=":material/show_chart:")
-    st.title("Plotting demo")
-    st.write(
-        """
-        This demo illustrates a combination of plotting and animation with
-        Streamlit. We're generating a bunch of random numbers in a loop for around
-        5 seconds. Enjoy!
-        """
-    )
     st.pyplot(fig)
 
 # 正文
+
+st.set_page_config(page_title="Plotting demo", page_icon=":material/show_chart:")
+st.title("Plotting demo")
+st.write(
+    """
+    This demo illustrates a combination of plotting and animation with
+    Streamlit. We're generating a bunch of random numbers in a loop for around
+    5 seconds. Enjoy!
+    """
+)
 plotting_curve()
