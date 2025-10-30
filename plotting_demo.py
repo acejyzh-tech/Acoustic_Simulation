@@ -12,7 +12,15 @@ def plotting_curve() -> None:
     col1, col2 = st.columns(2)
     with col1:
         C_SD = st.number_input("振膜顺性（fF）", 1.0, 4.0, 1.85, 0.1)
-        R_AH = st.number_input("声孔声阻（Mo）", 10.0, 500.0, 110.0, 10.0)
+        R_BH = st.number_input("背板声阻（MΩ）", 1.0, 4.0, 1.85, 0.1)
+        M_BH = st.number_input("背板惯性（KH）", 1.0, 4.0, 1.85, 0.1)
+        R_AH = st.number_input("声孔声阻（MΩ）", 10.0, 500.0, 110.0, 10.0)
+        M_AH = st.number_input("声孔惯性（KH）", 10.0, 200.0, 40.0, 5.0)
+        M_AH = st.number_input("声孔惯性（KH）", 10.0, 200.0, 40.0, 5.0)
+    with col2:
+        C_SD = st.number_input("振膜顺性（fF）", 1.0, 4.0, 1.85, 0.1)
+        R_AH = st.number_input("声孔声阻（MΩ）", 10.0, 500.0, 110.0, 10.0)
+        M_AH = st.number_input("声孔惯性（KH）", 10.0, 200.0, 40.0, 5.0)
         M_AH = st.number_input("声孔惯性（KH）", 10.0, 200.0, 40.0, 5.0)
 
     mic1 = ac.MIC()   # 定义MIC类mic1
