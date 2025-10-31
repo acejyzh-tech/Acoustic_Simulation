@@ -17,11 +17,24 @@ def plotting_curve() -> None:
         ''')
         col1, col2 = st.columns(2)
         with col1:
-            C_SD = st.number_input("振膜顺性（fF）", 1.0, 4.0, 1.85, 0.1)
-            R_BH = st.number_input("背板声阻（MΩ）", 1.0, 4.0, 1.85, 0.1)
-            M_BH = st.number_input("背板惯性（KH）", 1.0, 4.0, 1.85, 0.1)
-            R_AH = st.number_input("声孔声阻（MΩ）", 10.0, 500.0, 110.0, 10.0)
-            M_AH = st.number_input("声孔惯性（KH）", 10.0, 200.0, 40.0, 5.0)
+            C_SD = st.number_input("振膜声顺", 1.0, 4.0, 1.85, 0.1,
+                                     label_visibility="visible",
+                                     help='''
+                                     单位$fF$（$10^{-15}F$），由振膜的面积、形状和张力决定
+                                     ''',
+                                  )
+            R_VH = st.number_input("泄气孔阻尼", 10.0, 8000.0, 180.0, 10.0,
+                                     label_visibility="visible",
+                                     help='''
+                                     单位$G\Omega$（$10^{9}\Omega$），由振膜的面积、形状和张力决定
+                                     ''',
+                                  )
+            R_BH = st.number_input("背板阻尼",
+                                     label_visibility="visible",
+                                     help='''
+                                     单位$fF$（$10^{-15}F$），由振膜的面积、形状和张力决定
+                                     ''',
+                                  )
         with col2:
             st.write('test')
 
