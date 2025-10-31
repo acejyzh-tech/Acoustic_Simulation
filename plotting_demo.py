@@ -23,6 +23,7 @@ def plotting_curve() -> None:
             R_AH = st.number_input("声孔声阻（MΩ）", 10.0, 500.0, 110.0, 10.0)
             M_AH = st.number_input("声孔惯性（KH）", 10.0, 200.0, 40.0, 5.0)
         with col2:
+            st.write('test')
 
 
     mic1 = ac.MIC()   # 定义MIC类mic1
