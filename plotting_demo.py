@@ -41,8 +41,6 @@ def plotting_curve() -> None:
 
     mic1 = ac.MIC()   # 定义MIC类mic1
     mic1.SD.C = C_SD * 1e-15
-    mic1.AH.R = R_AH * 1e6
-    mic1.AH.M = M_AH * 1e3
     sens, N_AH, N_VH, N_BH, N_total = [], [], [], [], []  # 初始化数组
     # 计算
     for f in freqs:
