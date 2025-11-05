@@ -17,30 +17,48 @@ def plotting_curve() -> None:
         ''')
         col1, col2 = st.columns(2)
         with col1:
-            C_SD = st.number_input("振膜声顺", 1.0, 4.0, 1.85, 0.1,
+            C_SD = st.number_input("振膜声顺（$fF$）", 1.0, 4.0, 1.85, 0.1,
                                      label_visibility="visible",
                                      help='''
-                                     单位$fF$（$10^{-15}F$），由振膜的面积、形状和张力决定
+                                     由振膜的面积、形状和张力决定
                                      ''',
                                   )
-            R_VH = st.number_input("泄气孔阻尼", 10.0, 8000.0, 180.0, 10.0,
+            R_VH = st.number_input("泄气孔声阻尼（$G\Omega$）", 10.0, 8000.0, 180.0, 10.0,
                                      label_visibility="visible",
                                      help='''
-                                     单位$G\Omega$（$10^{9}\Omega$），由振膜的面积、形状和张力决定
+                                     由泄气通道的几何尺寸而定，通常可用毛细孔近似处理，其阻尼与频率无关
                                      ''',
                                   )
-            R_BH = st.number_input("背板阻尼",
+            R_BH = st.number_input("薄流层声阻尼（$M\Omega$）", 100.0, 500.0, 280.0, 10.0,
                                      label_visibility="visible",
                                      help='''
-                                     单位$fF$（$10^{-15}F$），由振膜的面积、形状和张力决定
+                                     包括薄流层及背板孔贡献的声阻尼。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关
+                                     ''',
+                                  )
+            M_BH = st.number_input("薄流层声质量（$KH$）", 1.0, 10.0, 6.0, 10.0,
+                                     label_visibility="visible",
+                                     help='''
+                                     包括薄流层及背板孔贡献的声质量。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关
                                      ''',
                                   )
         with col2:
             st.write('test')
+            D_AH = st.number_input("声孔直径（$mm$）", 0.1, 0.8, 0.3, 0.1,
+                                     label_visibility="visible",
+                                     help='''
+                                     麦克风进声孔直径，由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。
+                                     ''',
+                                  )
+
+
 
 
     mic1 = ac.MIC()   # 定义MIC类mic1
     mic1.SD.C = C_SD * 1e-15
+    mic1.VH.R = R_VH * 1e9
+    mic1.BH.R = R_BH * 1e6
+    mic1.BH.M = M_BH * 1e3    
+
     sens, N_AH, N_VH, N_BH, N_total = [], [], [], [], []  # 初始化数组
     # 计算
     for f in freqs:
