@@ -44,11 +44,11 @@ def plotting_curve() -> None:
     sens, N_AH, N_VH, N_BH, N_total = [], [], [], [], []  # 初始化数组
     # 计算
     for f in freqs:
-        sens.append(mic1.Sens(f))
-        N_AH.append(mic1.N_AH(f))
-        N_VH.append(mic1.N_VH(f))
-        N_BH.append(mic1.N_BH(f))
-        N_total.append(mic1.N_total(f))
+        sens.append(ac.dB(mic1.Sens(f)))
+        N_AH.append(ac.dB(mic1.N_AH(f)))
+        N_VH.append(ac.dB(mic1.N_VH(f)))
+        N_BH.append(ac.dB(mic1.N_BH(f)))
+        N_total.append(ac.dB(mic1.N_total(f)))
         
     # 绘制图形
     df = pd.DataFrame({'Freq': freqs, 'Sensitivity': sens})
