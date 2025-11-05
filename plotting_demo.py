@@ -38,7 +38,7 @@ def plotting_curve() -> None:
                                   )
             R_BH = st.number_input("薄流层声阻尼（$M\Omega$）", 100.0, 500.0, 280.0, 10.0,
                                      label_visibility="visible",
-                                     help='包括薄流层及背板孔贡献的声阻尼。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关。'',
+                                     help='包括薄流层及背板孔贡献的声阻尼。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关。',
                                   )
             M_BH = st.number_input("薄流层声质量（$KH$）", 1.0, 10.0, 6.0, 10.0,
                                      label_visibility="visible",
