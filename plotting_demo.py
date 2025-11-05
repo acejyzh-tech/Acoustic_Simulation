@@ -42,26 +42,29 @@ def plotting_curve() -> None:
                                      ''',
                                   )
         with col2:
-            st.write('test')
             D_AH = st.number_input("声孔直径（$mm$）", 0.1, 0.8, 0.3, 0.1,
                                      label_visibility="visible",
+                                     help='麦克风进声孔直径，由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。',
+                                  )
+            L_AH = st.number_input("声孔长度（$mm$）", 0.1, 0.8, 0.2, 0.1,
+                                     label_visibility="visible",
                                      help='''
-                                     麦克风进声孔直径，由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。
+                                     麦克风进声孔长度，由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。
                                      ''',
                                   )
-
-
-
+            
 
     mic1 = ac.MIC()   # 定义MIC类mic1
     mic1.SD.C = C_SD * 1e-15
     mic1.VH.R = R_VH * 1e9
     mic1.BH.R = R_BH * 1e6
-    mic1.BH.M = M_BH * 1e3    
+    mic1.BH.M = M_BH * 1e3
 
     sens, N_AH, N_VH, N_BH, N_total = [], [], [], [], []  # 初始化数组
     # 计算
     for f in freqs:
+        mic1.AH.R = ac.Ra(f=f, D=D_AH*1e-3, L=L_AH*1e-3)
+        mic1.AH.M = ac.Ma(f=f, D=D_AH*1e-3, L=L_AH*1e-3)
         sens.append(ac.dB(mic1.Sens(f)))
         N_AH.append(ac.dB(mic1.N_AH(f)))
         N_VH.append(ac.dB(mic1.N_VH(f)))
