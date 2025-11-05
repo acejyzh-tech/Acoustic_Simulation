@@ -51,10 +51,10 @@ def plotting_curve() -> None:
         N_total.append(mic1.N_total(f))
         
     # 绘制图形
-    df = pd.DataFrame({'freq': freqs, 'Sensitivity': sens})
+    df = pd.DataFrame({'Freq': freqs, 'Sensitivity': sens})
     chart = alt.Chart(df).mark_line().encode(
-    x=alt.X('freq', scale=alt.Scale(type='log'), title='频率（Hz）'),  # 设置横坐标为对数刻度
-    y=alt.Y('Sensitivity', title='dB')  # 纵坐标为正弦值
+    x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
+    y=alt.Y('Sensitivity', title='dB')
     )
     st.altair_chart(chart)
 
