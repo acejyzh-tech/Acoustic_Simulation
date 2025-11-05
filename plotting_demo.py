@@ -8,7 +8,7 @@ import JYAcoustic as ac
 
 def plotting_curve() -> None:
     freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
-    # 侧边参数输入栏
+
     with st.expander("麦克风参数"):
         st.write('''
             The chart above shows some numbers I picked for you.
@@ -16,41 +16,33 @@ def plotting_curve() -> None:
             be random.
         ''')
         col1, col2 = st.columns(2)
+
         with col1:
-            C_SD = st.number_input("振膜声顺（$fF$）", 1.0, 4.0, 1.85, 0.1,
-                                     label_visibility="visible",
-                                     help='''
-                                     由振膜的面积、形状和张力决定
-                                     ''',
-                                  )
-            R_VH = st.number_input("泄气孔声阻尼（$G\Omega$）", 10.0, 8000.0, 180.0, 10.0,
-                                     label_visibility="visible",
-                                     help='''
-                                     由泄气通道的几何尺寸而定，通常可用毛细孔近似处理，其阻尼与频率无关
-                                     ''',
-                                  )
-            R_BH = st.number_input("薄流层声阻尼（$M\Omega$）", 100.0, 500.0, 280.0, 10.0,
-                                     label_visibility="visible",
-                                     help='''
-                                     包括薄流层及背板孔贡献的声阻尼。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关
-                                     ''',
-                                  )
-            M_BH = st.number_input("薄流层声质量（$KH$）", 1.0, 10.0, 6.0, 10.0,
-                                     label_visibility="visible",
-                                     help='''
-                                     包括薄流层及背板孔贡献的声质量。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关
-                                     ''',
-                                  )
-        with col2:
             D_AH = st.number_input("声孔直径（$mm$）", 0.1, 0.8, 0.3, 0.1,
                                      label_visibility="visible",
-                                     help='麦克风进声孔直径，由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。',
+                                     help='麦克风进声孔直径。由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。',
                                   )
             L_AH = st.number_input("声孔长度（$mm$）", 0.1, 0.8, 0.2, 0.1,
                                      label_visibility="visible",
-                                     help='''
-                                     麦克风进声孔长度，由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。
-                                     ''',
+                                     help='麦克风进声孔长度。由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。',
+                                  )
+        
+        with col2:
+            C_SD = st.number_input("振膜声顺（$fF$）", 1.0, 4.0, 1.85, 0.1,
+                                     label_visibility="visible",
+                                     help='由振膜的面积、形状和张力决定。',
+                                  )
+            R_VH = st.number_input("泄气孔声阻尼（$G\Omega$）", 10.0, 8000.0, 180.0, 10.0,
+                                     label_visibility="visible",
+                                     help='由泄气通道的几何尺寸而定，通常可用毛细孔近似处理，其阻尼与频率无关。',
+                                  )
+            R_BH = st.number_input("薄流层声阻尼（$M\Omega$）", 100.0, 500.0, 280.0, 10.0,
+                                     label_visibility="visible",
+                                     help='包括薄流层及背板孔贡献的声阻尼。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关。'',
+                                  )
+            M_BH = st.number_input("薄流层声质量（$KH$）", 1.0, 10.0, 6.0, 10.0,
+                                     label_visibility="visible",
+                                     help='包括薄流层及背板孔贡献的声质量。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关。',
                                   )
             
 
