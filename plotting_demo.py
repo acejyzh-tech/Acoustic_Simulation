@@ -23,7 +23,7 @@ with st.sidebar:
     D_AH = st.number_input("声孔直径（$mm$）", 0.1, 0.8, 0.3, 0.1,
                              label_visibility="visible",
                              help='麦克风进声孔直径。由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。$R_a=\eta$',
-                          )
+                          ) * 1e-15
     L_AH = st.number_input("声孔长度（$mm$）", 0.1, 0.8, 0.2, 0.1,
                              label_visibility="visible",
                              help='麦克风进声孔长度。由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。',
@@ -46,7 +46,7 @@ with st.sidebar:
                           )
 
 mic1 = ac.MIC()   # 定义MIC类mic1
-mic1.SD.C = C_SD * 1e-15
+mic1.SD.C = C_SD
 mic1.VH.R = R_VH * 1e9
 mic1.BH.R = R_BH * 1e6
 mic1.BH.M = M_BH * 1e3
