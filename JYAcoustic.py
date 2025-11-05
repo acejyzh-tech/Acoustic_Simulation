@@ -5,10 +5,12 @@ by J.Y.Zhang
 （2）低衰和谐振特性的计算
 （3）非线性失真计算
 （4）等效电路的基尔霍夫方法求解
+
+2025/10/28 初始版本
+2025/11/05 更新微孔管计算声阻抗
 '''
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 # 物理常数
 PI = np.pi  # 圆周率
@@ -43,7 +45,7 @@ def print_air_para(): # 输出物理参数
     print(f'气压：{p0} Pa；')
     print(f'空气密度：{rho0:.3f} kg/m3')
     print(f'空气热导率：{k0:.3g} W/(m K)')
-    print(f'空气运动粘滞系数：{ETA:.3g} Pa s')
+    print(f'空气运动粘滞系数：{ETA:.4g} Pa s')
     print(f'空气声速：{c0:.1f} m/s')
     print(f'空气特性阻抗：{Z0:.1f} N s/m3')
     print('-'*20)
@@ -120,6 +122,14 @@ def interp(x, y, T):
     return y1
 
 '''
+阻抗集中参数计算
+'''
+def fc(L=1e-3): return 64*ETA/PI/rho0/L**2  # 计算特定特征尺度结构的临界频率
+def dL(D=1e-3): return 4*D/3/PI  # 计算孔端修正
+def Ra(f=1000, D=1e-3, L=1e-3): return 128*ETA*(L+2*dL(D))/PI/D**4 * np.sqrt(1+f/fc(D))
+def Ma(f=1000, D=1e-3, L=1e-3): return 4*rho0*(L+2*dL(D))/PI/D**2 * (1+1/np.sqrt(9+16*f/fc(D)))
+def Ca(V=1e-9): return V/rho0/c0**2
+'''
 麦克风频响及噪声特性求解 V1.0
 '''
 class AC:  # 定义阻抗类
@@ -138,8 +148,8 @@ class MIC:  # 麦克风参数类
     # 麦克风初始化，振膜SD / 进声孔AH / 泄气孔VH / 背板孔BH / 前腔FC / 后腔BC
     def __init__(self,
                  SD=AC(0, 0, 1.84e-15),
-                 AH=AC(110e6, 40e3), VH=AC(275000e6), BH=AC(286e6, 5.826e3),
-                 FC=AC(0,0,0.98e-15), BC=AC(0,0,9.2e-15)):
+                 AH=AC(Ra(1,0.28e-3,0.22e-3), Ma(1,0.28e-3,0.22e-3)), VH=AC(275000e6), BH=AC(286e6, 6e3),
+                 FC=AC(0,0,Ca(0.14e-9)), BC=AC(0,0,Ca(1.3e-9))):
         self.SD = SD
         self.AH, self.VH, self.BH = AH, VH, BH
         self.FC, self.BC = FC, BC
@@ -159,32 +169,7 @@ class MIC:  # 麦克风参数类
 
 ''''''''''''''''''''''''''''''''''''
 def main():
-    def eg01():
-    # Example 01: 绘制频响及噪声谱曲线
-        mic1 = MIC()   # 定义MIC类mic1
-        freqs = 10**np.linspace(1, 5, 2000)
-        sens, N_AH, N_VH, N_BH, N_total = [], [], [], [], []  # 初始化数组
-        # 计算
-        for f in freqs:
-            sens.append(mic1.Sens(f))
-            N_AH.append(mic1.N_AH(f))
-            N_VH.append(mic1.N_VH(f))
-            N_BH.append(mic1.N_BH(f))
-            N_total.append(mic1.N_total(f))
-        # 绘制图形
-        plt.figure(figsize=(8,6))
-        ax = plt.subplot()
-        ax.semilogx(freqs, dB(sens), '-k', label='Sensitivity') 
-        ax.semilogx(freqs, dB(N_AH), '-C0', label='Acoustic Inlet')
-        ax.semilogx(freqs, dB(N_VH), '-C1', label='Vent Hole')
-        ax.semilogx(freqs, dB(N_BH), '-C2', label='Backplete Hole')
-        ax.semilogx(freqs, dB(N_total), '-k', label='Total Noise')
-        ax.grid()
-        ax.legend(loc='best')
-        plt.show()
-    
-    # print_air_para()
-    eg01()
-
+    print_air_para()
+ 
 if __name__ == '__main__':
     main()
