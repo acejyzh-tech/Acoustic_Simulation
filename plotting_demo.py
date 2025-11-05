@@ -23,7 +23,7 @@ with st.sidebar:
     D_AH = st.number_input("声孔直径（$mm$）", 0.1, 0.8, 0.3, 0.1,
                              label_visibility="visible",
                              help='麦克风进声孔直径。由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。$R_a=\eta$',
-                          ) * 1e-15
+                          )
     L_AH = st.number_input("声孔长度（$mm$）", 0.1, 0.8, 0.2, 0.1,
                              label_visibility="visible",
                              help='麦克风进声孔长度。由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。',
@@ -31,7 +31,7 @@ with st.sidebar:
     C_SD = st.number_input("振膜声顺（$fF$）", 1.0, 4.0, 1.85, 0.1,
                              label_visibility="visible",
                              help='由振膜的面积、形状和张力决定。',
-                          )
+                          ) * 1e-15
     R_VH = st.number_input("泄气孔声阻尼（$G\Omega$）", 10.0, 8000.0, 180.0, 10.0,
                              label_visibility="visible",
                              help='由泄气通道的几何尺寸而定，通常可用毛细孔近似处理，其阻尼与频率无关。',
