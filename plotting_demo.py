@@ -7,7 +7,7 @@ import JYAcoustic as ac
 def plotting_curve() -> None:
     freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 
-    with st.expander("麦克风参数"):
+    with st.sidebar("麦克风参数"):
         st.write('''
             The chart above shows some numbers I picked for you.
             I rolled actual dice for these, so they're *guaranteed* to
