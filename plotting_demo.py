@@ -51,18 +51,13 @@ def plotting_curve() -> None:
         N_total.append(mic1.N_total(f))
         
     # 绘制图形
-    fig = plt.figure(figsize=(8,6))
-    ax = plt.subplot()
-    ax.semilogx(freqs, ac.dB(sens), '-k', label='Sensitivity') 
-    ax.semilogx(freqs, ac.dB(N_AH), '-C0', label='Acoustic Inlet')
-    ax.semilogx(freqs, ac.dB(N_VH), '-C1', label='Vent Hole')
-    ax.semilogx(freqs, ac.dB(N_BH), '-C2', label='Backplete Hole')
-    ax.semilogx(freqs, ac.dB(N_total), '-k', label='Total Noise')
-    ax.grid()
-    ax.legend(loc='best')
-    
-    # 显示图形
-    st.pyplot(fig)
+    df = pd.DataFrame({'freq': freqs, 'Sensitivity': sens})
+    chart = alt.Chart(df).mark_line().encode(
+    x=alt.X('freq', scale=alt.Scale(type='log'), title='频率（Hz）'),  # 设置横坐标为对数刻度
+    y=alt.Y('Sensitivity', title='dB')  # 纵坐标为正弦值
+    )
+    st.altair_chart(chart)
+
 
 # 正文
 
