@@ -51,10 +51,17 @@ def plotting_curve() -> None:
         N_total.append(ac.dB(mic1.N_total(f)))
         
     # 绘制图形
-    df = pd.DataFrame({'Freq': freqs, 'Sensitivity': sens})
+    df = pd.DataFrame({
+        'Freq': freqs, 
+        'Sensitivity': sens, 
+        'Total Noise': N_total
+    })
     chart = alt.Chart(df).mark_line().encode(
     x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
     y=alt.Y('Sensitivity', title='dB')
+    ) + alt.Chart(df).mark_line().encode(
+    x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
+    y=alt.Y('Total Noise', title='dB')
     )
     st.altair_chart(chart)
 
