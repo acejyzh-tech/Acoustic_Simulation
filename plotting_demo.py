@@ -4,10 +4,6 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
-def plotting_curve() -> None:
-    pass
-
-
 # 正文
 
 st.set_page_config(page_title="Plotting demo", page_icon=":material/show_chart:")
@@ -19,12 +15,10 @@ st.write(
     5 seconds. Enjoy!
     """
 )
-plotting_curve()
-
 
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 with st.sidebar:
-    st.markdown(':material/Settings: 设置以下麦克风参数，右侧图表中的曲线会同步更新。')
+    st.markdown(':material/Settings: 参数设置')
 
     D_AH = st.number_input("声孔直径（$mm$）", 0.1, 0.8, 0.3, 0.1,
                              label_visibility="visible",
