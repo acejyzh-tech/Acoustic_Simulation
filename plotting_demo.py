@@ -6,15 +6,12 @@ import JYAcoustic as ac
 
 def plotting_curve() -> None:
     freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
-
     with st.sidebar:
-        st.write('''
-            设置麦克风参数，右侧图表中的曲线会同步更新。
-        ''')
+        st.markdown(':material/Settings: 设置以下麦克风参数，右侧图表中的曲线会同步更新。')
 
         D_AH = st.number_input("声孔直径（$mm$）", 0.1, 0.8, 0.3, 0.1,
                                  label_visibility="visible",
-                                 help='麦克风进声孔直径。由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。',
+                                 help='麦克风进声孔直径。由于边界层与孔径数量级接近，这里将采用微孔管模型进行计算。$R_a=\eta$',
                               )
         L_AH = st.number_input("声孔长度（$mm$）", 0.1, 0.8, 0.2, 0.1,
                                  label_visibility="visible",
@@ -28,15 +25,14 @@ def plotting_curve() -> None:
                                  label_visibility="visible",
                                  help='由泄气通道的几何尺寸而定，通常可用毛细孔近似处理，其阻尼与频率无关。',
                               )
-        R_BH = st.number_input("薄流层声阻尼（$M\Omega$）", 100.0, 500.0, 280.0, 10.0,
+        R_BH = st.number_input("薄流层声阻尼（$M\Omega$）", 100.0, 500.0, 280.0, 20.0,
                                  label_visibility="visible",
                                  help='包括薄流层及背板孔贡献的声阻尼。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关。',
                               )
-        M_BH = st.number_input("薄流层声质量（$KH$）", 1.0, 10.0, 6.0, 10.0,
+        M_BH = st.number_input("薄流层声质量（$KH$）", 1.0, 10.0, 6.0, 1.0,
                                  label_visibility="visible",
                                  help='包括薄流层及背板孔贡献的声质量。由薄流层厚度、背板孔的尺寸与分布决定，通常可用毛细孔近似处理，与频率无关。',
                               )
-            
 
     mic1 = ac.MIC()   # 定义MIC类mic1
     mic1.SD.C = C_SD * 1e-15
