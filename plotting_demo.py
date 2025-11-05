@@ -1,5 +1,3 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
-import time
 import numpy as np
 import pandas as pd
 import streamlit as st
