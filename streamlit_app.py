@@ -20,14 +20,13 @@ from pathlib import Path
 
 dir_path = Path(__file__).parent
 
-# Note that this needs to be in a method so we can have an e2e playwright test.
 def run() -> None:
     page = st.navigation(
         {
             "JYZhang 的声学工具箱": [
                 st.Page(
                     dir_path / "plotting_demo.py",
-                    title="由低衰和谐振峰点生成麦克风频响曲线",
+                    title="麦克风集中参数法仿真",
                     icon=":material/show_chart:",
                 ),
                 st.Page(
@@ -39,7 +38,6 @@ def run() -> None:
         }
     )
     page.run()
-
 
 if __name__ == "__main__":
     run()
