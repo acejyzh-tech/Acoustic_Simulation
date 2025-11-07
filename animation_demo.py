@@ -38,6 +38,7 @@ if 'initialized' not in st.session_state:
     st.session_state.filtered_audio_cache = {}
     st.session_state.audio_base64_cache = {}
     st.session_state.spectrogram_cache = {}
+    st.session_state.filter_version = 0  # 用于触发音频组件更新
 
 # ---------------------- 核心优化：缓存与预计算 ----------------------
 @lru_cache(maxsize=4)
@@ -87,9 +88,9 @@ def precompute_all_filters(audio_data, sr):
     return filtered_cache
 
 @lru_cache(maxsize=32)
-def cached_spectrogram(audio_data_tuple, sr, play_position):
+def cached_spectrogram(audio_data_tuple, sr, play_position, filter_name):
     """
-    缓存声谱图计算结果
+    缓存声谱图计算结果（添加filter_name作为缓存键）
     """
     audio_data = np.array(audio_data_tuple)
     fig, ax = plt.subplots(figsize=(14, 5))
@@ -125,7 +126,7 @@ def cached_spectrogram(audio_data_tuple, sr, play_position):
         )
         ax.legend(loc='upper right', fontsize=10)
     
-    ax.set_title(f"{st.session_state.selected_filter} - 声谱图", fontsize=16, fontweight='bold')
+    ax.set_title(f"{filter_name} - 声谱图", fontsize=16, fontweight='bold')
     ax.set_xlabel('时间 (s)', fontsize=12)
     ax.set_ylabel('频率 (Hz)', fontsize=12)
     ax.grid(True, alpha=0.3)
@@ -136,17 +137,16 @@ def cached_spectrogram(audio_data_tuple, sr, play_position):
 # ---------------------- 界面与逻辑 ----------------------
 def render_audio_player(filter_name):
     """
-    渲染音频播放器（无延迟切换）
+    渲染音频播放器（修复key参数问题）
     """
     # 直接从缓存获取Base64编码
     audio_base64 = st.session_state.audio_base64_cache[filter_name]
     
-    # 播放器组件（使用key确保Streamlit正确更新）
+    # 移除不支持的key参数，通过filter_version触发更新
     st.audio(
         audio_base64,
         format='audio/wav',
-        start_time=st.session_state.play_position,
-        key=f"audio_player_{filter_name}"
+        start_time=st.session_state.play_position
     )
 
 def render_spectrogram(filter_name):
@@ -160,7 +160,8 @@ def render_spectrogram(filter_name):
     fig = cached_spectrogram(
         audio_tuple,
         st.session_state.sr,
-        round(st.session_state.play_position, 1)  # 四舍五入减少缓存键数量
+        round(st.session_state.play_position, 1),  # 四舍五入减少缓存键数量
+        filter_name  # 添加滤波名称作为缓存键
     )
     
     st.pyplot(fig, use_container_width=True)
@@ -230,14 +231,18 @@ with col1:
             )
             st.session_state.play_position = play_position
             
-            # 实时更新选中的滤波模式
+            # 实时更新选中的滤波模式（触发音频更新）
             if selected_filter != st.session_state.selected_filter:
                 st.session_state.selected_filter = selected_filter
+                st.session_state.filter_version += 1  # 递增版本号触发更新
             
-            # 音频播放器（无延迟切换）
+            # 音频播放器（修复key参数问题）
             st.markdown("---")
-            st.subheader("当前音频:")
-            render_audio_player(selected_filter)
+            st.subheader(f"当前音频: {selected_filter}")
+            # 使用空容器和版本号确保更新
+            audio_container = st.container()
+            with audio_container:
+                render_audio_player(selected_filter)
             
             # 下载功能
             st.markdown("---")
@@ -248,7 +253,7 @@ with col1:
             filter_suffix = selected_filter.replace("Hz", "").replace("高通滤波", "").replace("无", "no").strip()
             st.download_button(
                 label=f"下载{selected_filter}",
-                data=current_audio_b64.split(",")[1].encode(),  # 提取Base64数据
+                data=base64.b64decode(current_audio_b64.split(",")[1]),  # 正确解码Base64数据
                 file_name=f"filtered_{filter_suffix}.wav",
                 mime="audio/wav",
                 key=f"download_{selected_filter}"
@@ -258,24 +263,26 @@ with col1:
             original_b64 = st.session_state.audio_base64_cache["无滤波"]
             st.download_button(
                 label="下载原始音频",
-                data=original_b64.split(",")[1].encode(),
+                data=base64.b64decode(original_b64.split(",")[1]),
                 file_name="original_audio.wav",
-                mime="audio/wav"
+                mime="audio/wav",
+                key="download_original"
             )
             
             # 滤波效果说明
             st.markdown("---")
             st.subheader("ℹ️ 效果说明")
             filter_descriptions = {
-                "无滤波": "保留所有频率成分",
-                "100Hz高通滤波": "过滤100Hz以下低频噪声",
-                "200Hz高通滤波": "适合语音信号去噪",
-                "500Hz高通滤波": "突出高频细节"
+                "无滤波": "保留所有频率成分，原始音频效果",
+                "100Hz高通滤波": "过滤100Hz以下低频噪声（如电流声、隆隆声）",
+                "200Hz高通滤波": "适合语音信号去噪，保留主要语音频率",
+                "500Hz高通滤波": "突出高频细节，过滤更多低频成分"
             }
-            st.write(filter_descriptions[selected_filter])
+            st.info(filter_descriptions[selected_filter])
         
         except Exception as e:
             st.error(f"处理失败: {str(e)}")
+            st.exception(e)
             st.session_state.initialized = False  # 重置状态
     else:
         # 未上传文件时的提示
@@ -293,7 +300,7 @@ with col2:
     # 显示声谱图（无延迟更新）
     if st.session_state.initialized:
         # 直接从缓存渲染声谱图
-        render_spectrogram(selected_filter)
+        render_spectrogram(st.session_state.selected_filter)
     else:
         # 未上传文件时的占位图
         st.markdown("""
