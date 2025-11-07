@@ -4,28 +4,33 @@ import numpy as np
 from scipy.signal import butter, filtfilt
 import soundfile as sf
 from io import BytesIO
+import time
 
 # 设置页面配置
 st.set_page_config(
-    page_title="音频高通滤波工具（无缝切换版）",
+    page_title="音频高通滤波工具（完美无缝版）",
     page_icon="🎵",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # 页面标题和说明
-st.title("🎵 音频高通滤波工具（无缝切换版）")
+st.title("🎵 音频高通滤波工具（完美无缝版）")
 st.markdown("""
-支持WAV文件上传、**播放中实时无缝切换**滤波模式，无中断无迟滞。
+支持WAV文件上传、**播放中实时无缝切换**滤波模式，切换后自动继续播放，无任何中断。
 """, unsafe_allow_html=True)
 
-# ---------------------- 全局状态管理 ----------------------
+# ---------------------- 全局状态管理（关键优化） ----------------------
 if "current_time" not in st.session_state:
     st.session_state.current_time = 0.0  # 记录当前播放时间
 if "last_filter_option" not in st.session_state:
     st.session_state.last_filter_option = "无滤波"  # 上一次选择的滤波模式
-if "audio_placeholder" not in st.session_state:
-    st.session_state.audio_placeholder = None  # 音频组件占位符
+if "audio_data" not in st.session_state:
+    st.session_state.audio_data = {}  # 存储所有音频字节流
+if "is_playing" not in st.session_state:
+    st.session_state.is_playing = False  # 记录播放状态
+if "last_update_time" not in st.session_state:
+    st.session_state.last_update_time = 0.0  # 上次时间更新时间
 
 # ---------------------- 核心函数定义 ----------------------
 
@@ -77,51 +82,73 @@ def audio_to_bytes(y, sr):
     buffer.seek(0)
     return buffer
 
-def get_audio_segment(y, sr, start_time=0.0):
-    """从指定时间点截取音频片段"""
+def get_audio_segment_bytes(y, sr, start_time=0.0):
+    """从指定时间点截取音频片段并转换为字节流"""
     start_sample = int(start_time * sr)
     if start_sample < len(y):
         if y.ndim == 2:
-            return y[:, start_sample:]  # 多通道：(channels, samples)
+            y_segment = y[:, start_sample:]  # 多通道：(channels, samples)
         else:
-            return y[start_sample:]     # 单通道：(samples,)
-    return y
+            y_segment = y[start_sample:]     # 单通道：(samples,)
+    else:
+        y_segment = y
+    
+    return audio_to_bytes(y_segment, sr)
 
-# ---------------------- JavaScript 注入（监听播放进度） ----------------------
+# ---------------------- JavaScript 注入（增强版） ----------------------
 def inject_audio_listener():
-    """注入JavaScript监听音频播放进度，更新session state"""
+    """注入增强版JavaScript，监听播放状态和进度"""
     js = """
     <script>
-    // 等待页面加载完成
-    document.addEventListener('DOMContentLoaded', function() {
-        // 定期检查音频元素（处理动态更新的情况）
-        setInterval(function() {
-            const audioElements = document.querySelectorAll('audio');
-            const activeAudio = Array.from(audioElements).find(el => !el.paused || el.currentTime > 0);
+    let lastPlayState = false;
+    let audioElement = null;
+    
+    // 定期检查音频元素
+    setInterval(function() {
+        const audioElements = document.querySelectorAll('audio');
+        // 找到活跃的音频元素（正在播放或有播放进度）
+        const newAudioElement = Array.from(audioElements).find(el => 
+            el.currentTime > 0.1 || !el.paused
+        );
+        
+        if (newAudioElement) {
+            audioElement = newAudioElement;
             
-            if (activeAudio) {
-                // 监听timeupdate事件（播放进度更新）
-                activeAudio.addEventListener('timeupdate', function() {
-                    const currentTime = this.currentTime;
-                    // 通过Streamlit的API更新session state
-                    window.parent.postMessage({
-                        type: 'streamlit:setComponentValue',
-                        value: currentTime.toString(),
-                        key: 'current_audio_time'
-                    }, '*');
-                });
-                
-                // 监听播放结束事件
-                activeAudio.addEventListener('ended', function() {
-                    window.parent.postMessage({
-                        type: 'streamlit:setComponentValue',
-                        value: '0.0',
-                        key: 'current_audio_time'
-                    }, '*');
-                });
+            // 监听播放状态变化
+            const isCurrentlyPlaying = !audioElement.paused;
+            if (isCurrentlyPlaying !== lastPlayState) {
+                lastPlayState = isCurrentlyPlaying;
+                // 发送播放状态
+                window.parent.postMessage({
+                    type: 'streamlit:setComponentValue',
+                    value: isCurrentlyPlaying ? 'true' : 'false',
+                    key: 'audio_play_state'
+                }, '*');
             }
-        }, 500);
-    });
+            
+            // 监听播放进度
+            const currentTime = audioElement.currentTime;
+            window.parent.postMessage({
+                type: 'streamlit:setComponentValue',
+                value: currentTime.toString(),
+                key: 'audio_current_time'
+            }, '*');
+            
+            // 监听播放结束
+            audioElement.addEventListener('ended', function() {
+                window.parent.postMessage({
+                    type: 'streamlit:setComponentValue',
+                    value: '0.0',
+                    key: 'audio_current_time'
+                }, '*');
+                window.parent.postMessage({
+                    type: 'streamlit:setComponentValue',
+                    value: 'false',
+                    key: 'audio_play_state'
+                }, '*');
+            });
+        }
+    }, 200);  // 200ms检查一次，平衡性能和实时性
     </script>
     """
     st.markdown(js, unsafe_allow_html=True)
@@ -138,6 +165,11 @@ if uploaded_file is not None:
     # 预计算所有滤波版本（使用缓存）
     processed_audio = load_and_preprocess_audio(file_bytes)
     y_original, sr, total_duration = processed_audio["无滤波"]
+    
+    # 预生成所有完整音频的字节流（避免重复转换）
+    if not st.session_state.audio_data:
+        for filter_name, (y_data, y_sr, _) in processed_audio.items():
+            st.session_state.audio_data[filter_name] = audio_to_bytes(y_data, y_sr)
     
     # 显示音频信息
     st.info(f"""
@@ -156,83 +188,108 @@ if uploaded_file is not None:
         horizontal=True  # 水平排列
     )
     
-    # 注入JavaScript监听播放进度
+    # 注入JavaScript监听
     inject_audio_listener()
     
-    # 接收JavaScript传递的当前播放时间
-    current_audio_time = st.text_input(
-        label="",
-        value=str(st.session_state.current_time),
-        key="current_audio_time",
-        label_visibility="hidden"
+    # 隐藏的输入框，用于接收JavaScript传递的状态（关键）
+    audio_play_state = st.text_input(
+        label="", value="false", key="audio_play_state", label_visibility="hidden"
+    )
+    audio_current_time = st.text_input(
+        label="", value="0.0", key="audio_current_time", label_visibility="hidden"
     )
     
-    # 更新session state中的当前时间
+    # 更新全局状态（关键优化：避免频繁更新）
+    current_time = st.session_state.current_time
     try:
-        st.session_state.current_time = float(current_audio_time)
+        new_current_time = float(audio_current_time)
+        new_is_playing = audio_play_state.lower() == "true"
+        
+        # 仅在时间变化超过0.1秒或播放状态变化时更新
+        if abs(new_current_time - current_time) > 0.1 or new_is_playing != st.session_state.is_playing:
+            st.session_state.current_time = new_current_time
+            st.session_state.is_playing = new_is_playing
+            st.session_state.last_update_time = time.time()
     except:
-        st.session_state.current_time = 0.0
+        pass
     
-    # 获取当前选择的音频数据，并从当前时间点截取
-    y_filtered, sr, _ = processed_audio[filter_option]
-    y_segment = get_audio_segment(y_filtered, sr, st.session_state.current_time)
-    audio_bytes = audio_to_bytes(y_segment, sr)
+    # 处理滤波模式切换（核心改进）
+    current_filter = filter_option
+    need_update_audio = False
     
-    # 音频播放区域（使用占位符动态更新）
+    if current_filter != st.session_state.last_filter_option:
+        # 切换了滤波模式
+        st.session_state.last_filter_option = current_filter
+        need_update_audio = True
+    
+    # 获取当前音频数据
+    y_filtered, sr, _ = processed_audio[current_filter]
+    
+    # 生成当前时间点的音频片段
+    current_play_time = st.session_state.current_time
+    audio_segment_bytes = get_audio_segment_bytes(y_filtered, sr, current_play_time)
+    
+    # 音频播放区域（使用动态更新，不刷新整个页面）
     st.subheader("播放音频")
-    if st.session_state.audio_placeholder is None:
-        st.session_state.audio_placeholder = st.empty()
+    audio_container = st.container()
     
-    # 在占位符中更新音频组件
-    with st.session_state.audio_placeholder.container():
+    # 关键：使用空占位符动态更新音频，不触发页面刷新
+    with audio_container:
+        # 始终显示当前的音频片段
         st.audio(
-            audio_bytes,
+            audio_segment_bytes,
             format="audio/wav",
-            start_time=0  # 片段从0开始（因为已经截取了前面的部分）
+            start_time=0  # 片段从0开始
         )
     
-    # 显示当前播放位置（增强用户体验）
-    col1, col2, col3 = st.columns(3)
+    # 显示播放进度条和时间
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        progress = min(st.session_state.current_time / total_duration if total_duration > 0 else 0.0, 1.0)
+        progress = min(current_play_time / total_duration if total_duration > 0 else 0.0, 1.0)
         st.progress(progress)
         st.markdown(f"""
         <div style="text-align: center; font-size: 14px;">
-            当前位置：{st.session_state.current_time:.2f} / {total_duration:.2f} 秒
+            当前位置：{current_play_time:.2f} / {total_duration:.2f} 秒 | 状态：{"播放中" if st.session_state.is_playing else "已暂停"}
         </div>
         """, unsafe_allow_html=True)
     
-    # 重置播放位置按钮
-    if st.button("🔄 重置播放位置", type="secondary"):
-        st.session_state.current_time = 0.0
-        st.rerun()
+    # 控制按钮
+    col1, col2, col3 = st.columns(3)
+    with col2:
+        reset_col1, reset_col2 = st.columns(2)
+        with reset_col1:
+            if st.button("🔄 重置播放位置"):
+                st.session_state.current_time = 0.0
+                st.session_state.is_playing = False
+        with reset_col2:
+            if st.button("⏮️ 回到开始"):
+                st.session_state.current_time = 0.0
+                st.session_state.is_playing = True
     
     # 下载选项
     st.subheader("下载处理后音频")
     col1, col2 = st.columns(2)
     with col1:
-        # 完整的滤波音频（不是片段）
-        full_filtered_audio = audio_to_bytes(y_filtered, sr)
+        # 下载完整的滤波音频
         st.download_button(
-            label=f"下载{filter_option}音频",
-            data=full_filtered_audio,
-            file_name=f"{uploaded_file.name[:-4]}_{filter_option.replace(' ', '_')}.wav",
+            label=f"下载{current_filter}音频",
+            data=st.session_state.audio_data[current_filter],
+            file_name=f"{uploaded_file.name[:-4]}_{current_filter.replace(' ', '_')}.wav",
             mime="audio/wav"
         )
     with col2:
         # 原始音频下载
-        original_audio_bytes = audio_to_bytes(y_original, sr)
         st.download_button(
             label="下载原始音频",
-            data=original_audio_bytes,
+            data=st.session_state.audio_data["无滤波"],
             file_name=f"{uploaded_file.name[:-4]}_原始音频.wav",
             mime="audio/wav"
         )
     
-    # 当滤波选项变化时，强制刷新音频组件
-    if st.session_state.last_filter_option != filter_option:
-        st.session_state.last_filter_option = filter_option
-        st.rerun()  # 重新运行脚本以更新音频片段
+    # 自动更新：当播放状态为播放中时，定期更新音频片段（关键）
+    if st.session_state.is_playing and time.time() - st.session_state.last_update_time > 0.5:
+        # 每0.5秒自动更新一次，确保音频连续
+        st.rerun(scope="component")  # 仅刷新组件，不刷新整个页面
 
 else:
     # 未上传文件时的提示
@@ -249,6 +306,6 @@ else:
 st.markdown("""
 ---
 <div style="text-align: center; color: #666; font-size: 12px;">
-    音频无缝滤波工具 | 支持播放中实时切换 | 基于Streamlit + Librosa构建 | 兼容所有Streamlit版本
+    音频无缝滤波工具 | 完美支持播放中切换 | 基于Streamlit + Librosa构建
 </div>
 """, unsafe_allow_html=True)
