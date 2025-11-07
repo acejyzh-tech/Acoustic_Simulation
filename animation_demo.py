@@ -7,80 +7,96 @@ from scipy import signal
 import soundfile as sf
 from io import BytesIO
 import base64
+from functools import lru_cache
 
 # 设置页面配置
 st.set_page_config(
-    page_title="音频分析与实时滤波工具",
+    page_title="🎵 音频分析与平滑滤波工具",
     page_icon="🎵",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 全局变量初始化
-if 'audio_data' not in st.session_state:
-    st.session_state.audio_data = None
-if 'sr' not in st.session_state:
-    st.session_state.sr = None
-if 'current_filtered_audio' not in st.session_state:
-    st.session_state.current_filtered_audio = None
-if 'play_position' not in st.session_state:
-    st.session_state.play_position = 0
-if 'selected_filter' not in st.session_state:
-    st.session_state.selected_filter = "无滤波"
-if 'filter_params' not in st.session_state:
-    # 定义预设滤波参数
-    st.session_state.filter_params = {
-        "无滤波": {"type": None, "order": 2, "cutoff": 0},
-        "100Hz高通滤波": {"type": "highpass", "order": 2, "cutoff": 100},
-        "200Hz高通滤波": {"type": "highpass", "order": 2, "cutoff": 200},
-        "500Hz高通滤波": {"type": "highpass", "order": 2, "cutoff": 500}
-    }
+# 全局配置
+FILTER_PRESETS = {
+    "无滤波": {"type": None, "order": 2, "cutoff": 0},
+    "100Hz高通滤波": {"type": "highpass", "order": 2, "cutoff": 100},
+    "200Hz高通滤波": {"type": "highpass", "order": 2, "cutoff": 200},
+    "500Hz高通滤波": {"type": "highpass", "order": 2, "cutoff": 500}
+}
+FILTER_NAMES = list(FILTER_PRESETS.keys())
 
-# 定义滤波器函数
-def apply_filter(audio_data, sr, filter_config):
+# 全局状态初始化
+if 'initialized' not in st.session_state:
+    st.session_state.initialized = False
+    st.session_state.audio_data = None
+    st.session_state.sr = None
+    st.session_state.duration = 0.0
+    st.session_state.play_position = 0.0
+    st.session_state.selected_filter = FILTER_NAMES[0]
+    # 预计算缓存
+    st.session_state.filtered_audio_cache = {}
+    st.session_state.audio_base64_cache = {}
+    st.session_state.spectrogram_cache = {}
+
+# ---------------------- 核心优化：缓存与预计算 ----------------------
+@lru_cache(maxsize=4)
+def cached_apply_filter(audio_data_tuple, sr, filter_type, filter_order, cutoff_freq):
     """
-    应用指定的滤波器
-    :param audio_data: 原始音频数据
-    :param sr: 采样率
-    :param filter_config: 滤波配置字典
-    :return: 处理后的音频数据
+    带缓存的滤波函数，避免重复计算
     """
-    if filter_config["type"] is None:  # 无滤波
+    audio_data = np.array(audio_data_tuple)
+    if filter_type is None:
         return audio_data.astype(np.float32)
     
-    # 计算归一化截止频率 (0 < Wn < 1)
-    Wn = filter_config["cutoff"] / (sr / 2)
+    # 归一化截止频率
+    Wn = cutoff_freq / (sr / 2)
     if Wn <= 0 or Wn >= 1:
-        st.warning(f"截止频率 {filter_config['cutoff']}Hz 超出有效范围，将使用无滤波")
         return audio_data.astype(np.float32)
     
-    # 设计2阶Butterworth滤波器
-    b, a = signal.butter(
-        filter_config["order"], 
-        Wn, 
-        btype=filter_config["type"], 
-        analog=False
-    )
-    
-    # 应用滤波器
+    # 2阶Butterworth滤波器（预设计算）
+    b, a = signal.butter(filter_order, Wn, btype=filter_type, analog=False)
     filtered_data = signal.lfilter(b, a, audio_data)
     return filtered_data.astype(np.float32)
 
-# 音频转Base64（用于Streamlit播放）
-def audio_to_base64(audio_data, sr):
-    buffer = BytesIO()
-    sf.write(buffer, audio_data, sr, format='WAV')
-    buffer.seek(0)
-    b64 = base64.b64encode(buffer.read()).decode()
-    return f"data:audio/wav;base64,{b64}"
+def precompute_all_filters(audio_data, sr):
+    """
+    预计算所有滤波模式的音频数据
+    """
+    audio_tuple = tuple(audio_data)  # 可哈希化用于缓存
+    filtered_cache = {}
+    
+    with st.spinner("预处理所有滤波模式（确保平滑切换）..."):
+        for filter_name, config in FILTER_PRESETS.items():
+            filtered_audio = cached_apply_filter(
+                audio_tuple,
+                sr,
+                config["type"],
+                config["order"],
+                config["cutoff"]
+            )
+            filtered_cache[filter_name] = filtered_audio
+            
+            # 预生成Base64编码
+            buffer = BytesIO()
+            sf.write(buffer, filtered_audio, sr, format='WAV')
+            buffer.seek(0)
+            b64 = base64.b64encode(buffer.read()).decode()
+            st.session_state.audio_base64_cache[filter_name] = f"data:audio/wav;base64,{b64}"
+    
+    return filtered_cache
 
-# 绘制声谱图（支持实时更新）
-def plot_spectrogram(audio_data, sr, title, play_position=0):
+@lru_cache(maxsize=32)
+def cached_spectrogram(audio_data_tuple, sr, play_position):
+    """
+    缓存声谱图计算结果
+    """
+    audio_data = np.array(audio_data_tuple)
     fig, ax = plt.subplots(figsize=(14, 5))
     
-    # 计算声谱图（使用更精细的参数）
-    n_fft = 2048
-    hop_length = 512
+    # 优化的STFT参数（平衡速度和精度）
+    n_fft = 1024
+    hop_length = 256
     D = librosa.amplitude_to_db(np.abs(librosa.stft(audio_data, n_fft=n_fft, hop_length=hop_length)), ref=np.max)
     
     # 绘制声谱图
@@ -91,24 +107,25 @@ def plot_spectrogram(audio_data, sr, title, play_position=0):
         x_axis='time', 
         y_axis='hz', 
         ax=ax,
-        fmin=20,  # 最小显示频率
-        fmax=sr/2  # 最大显示频率
+        fmin=20,
+        fmax=sr/2,
+        cmap='viridis'
     )
     fig.colorbar(img, ax=ax, format='%+2.0f dB', label='音量')
     
-    # 添加播放进度线（实时更新）
+    # 播放进度线
     if play_position > 0:
         ax.axvline(
             x=play_position, 
             color='red', 
             linestyle='--', 
             linewidth=3, 
-            alpha=0.8,
-            label=f'当前进度: {play_position:.2f}s'
+            alpha=0.9,
+            label=f'进度: {play_position:.2f}s'
         )
         ax.legend(loc='upper right', fontsize=10)
     
-    ax.set_title(title, fontsize=16, fontweight='bold')
+    ax.set_title(f"{st.session_state.selected_filter} - 声谱图", fontsize=16, fontweight='bold')
     ax.set_xlabel('时间 (s)', fontsize=12)
     ax.set_ylabel('频率 (Hz)', fontsize=12)
     ax.grid(True, alpha=0.3)
@@ -116,153 +133,180 @@ def plot_spectrogram(audio_data, sr, title, play_position=0):
     
     return fig
 
+# ---------------------- 界面与逻辑 ----------------------
+def render_audio_player(filter_name):
+    """
+    渲染音频播放器（无延迟切换）
+    """
+    # 直接从缓存获取Base64编码
+    audio_base64 = st.session_state.audio_base64_cache[filter_name]
+    
+    # 播放器组件（使用key确保Streamlit正确更新）
+    st.audio(
+        audio_base64,
+        format='audio/wav',
+        start_time=st.session_state.play_position,
+        key=f"audio_player_{filter_name}"
+    )
+
+def render_spectrogram(filter_name):
+    """
+    渲染声谱图（从缓存获取）
+    """
+    audio_data = st.session_state.filtered_audio_cache[filter_name]
+    audio_tuple = tuple(audio_data)
+    
+    # 从缓存获取或计算声谱图
+    fig = cached_spectrogram(
+        audio_tuple,
+        st.session_state.sr,
+        round(st.session_state.play_position, 1)  # 四舍五入减少缓存键数量
+    )
+    
+    st.pyplot(fig, use_container_width=True)
+
 # 主界面设计
-st.title("🎵 音频分析与实时滤波工具")
+st.title("🎵 音频分析与平滑滤波工具")
 st.markdown("---")
 
-# 侧边栏设置
+# 侧边栏
 with st.sidebar:
     st.header("📌 功能设置")
+    
+    # 1. 文件上传
     st.markdown("### 1. 上传音频文件")
     uploaded_file = st.file_uploader("支持WAV格式", type=['wav'])
     
-    st.markdown("### 2. 实时滤波切换")
-    st.info("选择滤波模式后实时生效，无需重新加载")
-    # 单选按钮组 - 实时切换滤波模式
+    # 2. 平滑滤波切换（核心交互）
+    st.markdown("### 2. 滤波模式切换")
+    st.success("✅ 切换无延迟，实时生效")
     selected_filter = st.radio(
         "选择滤波模式",
-        options=["无滤波", "100Hz高通滤波", "200Hz高通滤波", "500Hz高通滤波"],
+        options=FILTER_NAMES,
         index=0,
-        key="filter_radio"
+        key="filter_radio",
+        label_visibility="collapsed"  # 隐藏默认标签，使用自定义标题
     )
-    
-    # 保存当前选中的滤波模式
-    if selected_filter != st.session_state.selected_filter:
-        st.session_state.selected_filter = selected_filter
-        # 标记需要更新滤波
-        st.session_state.update_filter = True
 
 # 主功能区
-st.markdown("### 🎧 音频播放与可视化")
-st.markdown("---")
+col1, col2 = st.columns([1, 3])
 
-# 处理上传文件
-if uploaded_file is not None:
-    # 读取音频文件
-    try:
-        audio_data, sr = librosa.load(uploaded_file, sr=None, mono=True)
-        st.session_state.audio_data = audio_data
-        st.session_state.sr = sr
-        
-        # 计算音频时长
-        duration = librosa.get_duration(y=audio_data, sr=sr)
-        
-        # 显示文件信息
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.success("✅ 文件上传成功")
-        with col2:
-            st.info(f"采样率: {sr} Hz")
-        with col3:
-            st.info(f"时长: {duration:.2f} s")
-        with col4:
+with col1:
+    st.markdown("### 🎧 播放控制")
+    st.markdown("---")
+    
+    # 文件上传处理
+    if uploaded_file is not None:
+        try:
+            # 首次上传时初始化
+            if not st.session_state.initialized:
+                # 读取音频文件
+                audio_data, sr = librosa.load(uploaded_file, sr=None, mono=True)
+                duration = librosa.get_duration(y=audio_data, sr=sr)
+                
+                # 保存基础数据
+                st.session_state.audio_data = audio_data
+                st.session_state.sr = sr
+                st.session_state.duration = duration
+                st.session_state.initialized = True
+                
+                # 预计算所有滤波和编码（关键优化）
+                st.session_state.filtered_audio_cache = precompute_all_filters(audio_data, sr)
+            
+            # 显示文件信息
+            st.info(f"采样率: {st.session_state.sr} Hz")
+            st.info(f"时长: {st.session_state.duration:.2f} s")
             st.info(f"当前模式: {selected_filter}")
-        
-        # 实时应用滤波
-        filter_config = st.session_state.filter_params[selected_filter]
-        with st.spinner(f"正在应用 {selected_filter}..."):
-            current_audio = apply_filter(audio_data, sr, filter_config)
-            st.session_state.current_filtered_audio = current_audio
-        
-        # 音频播放控制区
-        st.markdown("---")
-        st.subheader("🎚️ 播放控制")
-        
-        # 播放进度条（支持拖拽定位）
-        play_position = st.slider(
-            "播放进度",
-            min_value=0.0,
-            max_value=duration,
-            value=st.session_state.play_position,
-            step=0.1,
-            key="play_slider",
-            format="%.1f s"
-        )
-        st.session_state.play_position = play_position
-        
-        # 播放按钮和音频组件
-        col_play, col_download = st.columns([1, 8])
-        with col_play:
-            st.markdown("### 播放:")
-        with col_download:
-            # 生成当前音频的Base64编码（实时更新）
-            current_audio_base64 = audio_to_base64(current_audio, sr)
-            st.audio(current_audio_base64, format='audio/wav', start_time=play_position)
-        
-        # 下载当前音频（根据选中的滤波模式）
-        st.markdown("---")
-        col_download1, col_download2 = st.columns(2)
-        with col_download1:
-            # 原始音频下载
-            original_audio_base64 = audio_to_base64(audio_data, sr)
+            
+            # 播放进度条（核心控制）
+            play_position = st.slider(
+                "播放进度",
+                min_value=0.0,
+                max_value=st.session_state.duration,
+                value=st.session_state.play_position,
+                step=0.1,
+                key="play_slider",
+                format="%.1f s"
+            )
+            st.session_state.play_position = play_position
+            
+            # 实时更新选中的滤波模式
+            if selected_filter != st.session_state.selected_filter:
+                st.session_state.selected_filter = selected_filter
+            
+            # 音频播放器（无延迟切换）
+            st.markdown("---")
+            st.subheader("当前音频:")
+            render_audio_player(selected_filter)
+            
+            # 下载功能
+            st.markdown("---")
+            st.subheader("📥 下载")
+            
+            # 下载当前滤波音频
+            current_audio_b64 = st.session_state.audio_base64_cache[selected_filter]
+            filter_suffix = selected_filter.replace("Hz", "").replace("高通滤波", "").replace("无", "no").strip()
             st.download_button(
-                label="📥 下载原始音频",
-                data=original_audio_base64,
+                label=f"下载{selected_filter}",
+                data=current_audio_b64.split(",")[1].encode(),  # 提取Base64数据
+                file_name=f"filtered_{filter_suffix}.wav",
+                mime="audio/wav",
+                key=f"download_{selected_filter}"
+            )
+            
+            # 下载原始音频
+            original_b64 = st.session_state.audio_base64_cache["无滤波"]
+            st.download_button(
+                label="下载原始音频",
+                data=original_b64.split(",")[1].encode(),
                 file_name="original_audio.wav",
                 mime="audio/wav"
             )
-        with col_download2:
-            # 当前滤波音频下载
-            filter_suffix = selected_filter.replace("Hz", "").replace("高通滤波", "").replace("无", "no").strip()
-            download_filename = f"filtered_audio_{filter_suffix}.wav"
-            st.download_button(
-                label=f"📥 下载{selected_filter}音频",
-                data=current_audio_base64,
-                file_name=download_filename,
-                mime="audio/wav"
-            )
+            
+            # 滤波效果说明
+            st.markdown("---")
+            st.subheader("ℹ️ 效果说明")
+            filter_descriptions = {
+                "无滤波": "保留所有频率成分",
+                "100Hz高通滤波": "过滤100Hz以下低频噪声",
+                "200Hz高通滤波": "适合语音信号去噪",
+                "500Hz高通滤波": "突出高频细节"
+            }
+            st.write(filter_descriptions[selected_filter])
         
-        # 声谱图显示区
-        st.markdown("---")
-        st.subheader("📊 实时声谱图")
-        
-        # 绘制当前音频的声谱图（带进度指示）
-        fig = plot_spectrogram(
-            current_audio,
-            sr,
-            title=f"{selected_filter} - 声谱图",
-            play_position=play_position
-        )
-        st.pyplot(fig, use_container_width=True)
-        
-        # 滤波效果说明
-        st.markdown("---")
-        st.subheader("ℹ️ 滤波效果说明")
-        filter_descriptions = {
-            "无滤波": "保留所有频率成分，原始音频效果",
-            "100Hz高通滤波": "过滤掉100Hz以下的低频噪声（如电流声、隆隆声）",
-            "200Hz高通滤波": "过滤掉200Hz以下的低频成分，适合语音信号去噪",
-            "500Hz高通滤波": "过滤掉500Hz以下的低频成分，突出高频细节"
-        }
-        st.info(filter_descriptions[selected_filter])
-        
-    except Exception as e:
-        st.error(f"文件处理失败: {str(e)}")
-        st.exception(e)
-else:
-    # 未上传文件时的提示
-    st.markdown("""
-        <div style="text-align: center; padding: 50px; background-color: #f8f9fa; border-radius: 10px;">
-            <h3>📤 请先上传WAV格式音频文件</h3>
-            <p style="color: #666; margin-top: 20px;">支持各种采样率的WAV文件，上传后即可实时切换滤波模式</p>
-        </div>
-    """, unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"处理失败: {str(e)}")
+            st.session_state.initialized = False  # 重置状态
+    else:
+        # 未上传文件时的提示
+        st.markdown("""
+            <div style="text-align: center; padding: 30px; background-color: #f8f9fa; border-radius: 8px; margin-top: 50px;">
+                <h4>📤 请上传WAV文件</h4>
+                <p style="color: #666; margin-top: 10px;">上传后自动预处理所有滤波模式</p>
+            </div>
+        """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("### 📊 实时声谱图")
+    st.markdown("---")
+    
+    # 显示声谱图（无延迟更新）
+    if st.session_state.initialized:
+        # 直接从缓存渲染声谱图
+        render_spectrogram(selected_filter)
+    else:
+        # 未上传文件时的占位图
+        st.markdown("""
+            <div style="text-align: center; padding: 100px; background-color: #f8f9fa; border-radius: 8px; height: 400px; display: flex; align-items: center; justify-content: center;">
+                <h3>🎵 上传文件后显示声谱图</h3>
+            </div>
+        """, unsafe_allow_html=True)
 
 # 页脚信息
 st.markdown("---")
 st.markdown("""
-    <div style="text-align: center; color: #666; margin-top: 20px;">
-        <p>🎯 实时滤波功能 | 支持无滤波/100Hz/200Hz/500Hz高通滤波 | 声谱图实时更新</p>
-        <p>技术支持: librosa, scipy, streamlit, matplotlib | 设计优化: 实时切换无刷新</p>
+    <div style="text-align: center; color: #666;">
+        <p>⚡ 平滑切换技术 | 预计算优化 | 无延迟交互</p>
+        <p>支持: 无滤波/100Hz/200Hz/500Hz高通滤波 | 实时声谱图更新</p>
     </div>
 """, unsafe_allow_html=True)
