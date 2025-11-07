@@ -4,7 +4,6 @@ import numpy as np
 from scipy.signal import butter, filtfilt
 import soundfile as sf
 from io import BytesIO
-import base64
 
 # 设置页面配置
 st.set_page_config(
@@ -23,10 +22,10 @@ st.markdown("""
 # ---------------------- 全局状态管理 ----------------------
 if "current_time" not in st.session_state:
     st.session_state.current_time = 0.0  # 记录当前播放时间
-if "audio_key" not in st.session_state:
-    st.session_state.audio_key = 0  # 用于强制刷新音频组件
-if "active_audio" not in st.session_state:
-    st.session_state.active_audio = None  # 当前激活的音频数据
+if "last_filter_option" not in st.session_state:
+    st.session_state.last_filter_option = "无滤波"  # 上一次选择的滤波模式
+if "audio_placeholder" not in st.session_state:
+    st.session_state.audio_placeholder = None  # 音频组件占位符
 
 # ---------------------- 核心函数定义 ----------------------
 
@@ -95,29 +94,33 @@ def inject_audio_listener():
     <script>
     // 等待页面加载完成
     document.addEventListener('DOMContentLoaded', function() {
-        // 获取音频元素
-        const audioElement = document.querySelector('audio');
-        if (audioElement) {
-            // 监听timeupdate事件（播放进度更新）
-            audioElement.addEventListener('timeupdate', function() {
-                const currentTime = this.currentTime;
-                // 通过Streamlit的API更新session state
-                window.parent.postMessage({
-                    type: 'streamlit:setComponentValue',
-                    value: currentTime,
-                    key: 'current_audio_time'
-                }, '*');
-            });
+        // 定期检查音频元素（处理动态更新的情况）
+        setInterval(function() {
+            const audioElements = document.querySelectorAll('audio');
+            const activeAudio = Array.from(audioElements).find(el => !el.paused || el.currentTime > 0);
             
-            // 监听播放结束事件
-            audioElement.addEventListener('ended', function() {
-                window.parent.postMessage({
-                    type: 'streamlit:setComponentValue',
-                    value: 0.0,
-                    key: 'current_audio_time'
-                }, '*');
-            });
-        }
+            if (activeAudio) {
+                // 监听timeupdate事件（播放进度更新）
+                activeAudio.addEventListener('timeupdate', function() {
+                    const currentTime = this.currentTime;
+                    // 通过Streamlit的API更新session state
+                    window.parent.postMessage({
+                        type: 'streamlit:setComponentValue',
+                        value: currentTime.toString(),
+                        key: 'current_audio_time'
+                    }, '*');
+                });
+                
+                // 监听播放结束事件
+                activeAudio.addEventListener('ended', function() {
+                    window.parent.postMessage({
+                        type: 'streamlit:setComponentValue',
+                        value: '0.0',
+                        key: 'current_audio_time'
+                    }, '*');
+                });
+            }
+        }, 500);
     });
     </script>
     """
@@ -157,36 +160,51 @@ if uploaded_file is not None:
     inject_audio_listener()
     
     # 接收JavaScript传递的当前播放时间
-    current_time = st.session_state.get("current_time", 0.0)
+    current_audio_time = st.text_input(
+        label="",
+        value=str(st.session_state.current_time),
+        key="current_audio_time",
+        label_visibility="hidden"
+    )
+    
+    # 更新session state中的当前时间
+    try:
+        st.session_state.current_time = float(current_audio_time)
+    except:
+        st.session_state.current_time = 0.0
     
     # 获取当前选择的音频数据，并从当前时间点截取
     y_filtered, sr, _ = processed_audio[filter_option]
-    y_segment = get_audio_segment(y_filtered, sr, current_time)
+    y_segment = get_audio_segment(y_filtered, sr, st.session_state.current_time)
     audio_bytes = audio_to_bytes(y_segment, sr)
     
-    # 音频播放区域（使用动态key确保切换时刷新）
+    # 音频播放区域（使用占位符动态更新）
     st.subheader("播放音频")
-    st.audio(
-        audio_bytes,
-        format="audio/wav",
-        start_time=0,  # 片段从0开始（因为已经截取了前面的部分）
-        key=f"audio_player_{st.session_state.audio_key}"
-    )
+    if st.session_state.audio_placeholder is None:
+        st.session_state.audio_placeholder = st.empty()
+    
+    # 在占位符中更新音频组件
+    with st.session_state.audio_placeholder.container():
+        st.audio(
+            audio_bytes,
+            format="audio/wav",
+            start_time=0  # 片段从0开始（因为已经截取了前面的部分）
+        )
     
     # 显示当前播放位置（增强用户体验）
     col1, col2, col3 = st.columns(3)
     with col2:
-        st.progress(current_time / total_duration if total_duration > 0 else 0.0)
+        progress = min(st.session_state.current_time / total_duration if total_duration > 0 else 0.0, 1.0)
+        st.progress(progress)
         st.markdown(f"""
         <div style="text-align: center; font-size: 14px;">
-            当前位置：{current_time:.2f} / {total_duration:.2f} 秒
+            当前位置：{st.session_state.current_time:.2f} / {total_duration:.2f} 秒
         </div>
         """, unsafe_allow_html=True)
     
     # 重置播放位置按钮
     if st.button("🔄 重置播放位置", type="secondary"):
         st.session_state.current_time = 0.0
-        st.session_state.audio_key += 1  # 强制刷新播放器
         st.rerun()
     
     # 下载选项
@@ -211,12 +229,11 @@ if uploaded_file is not None:
             mime="audio/wav"
         )
     
-    # 监听滤波选项变化，更新播放器（保持播放位置）
-    if st.session_state.get("last_filter_option") != filter_option:
+    # 当滤波选项变化时，强制刷新音频组件
+    if st.session_state.last_filter_option != filter_option:
         st.session_state.last_filter_option = filter_option
-        st.session_state.audio_key += 1  # 强制刷新播放器
-        # 不需要rerun，Streamlit会自动更新
-    
+        st.rerun()  # 重新运行脚本以更新音频片段
+
 else:
     # 未上传文件时的提示
     st.empty()
@@ -228,25 +245,10 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-# ---------------------- 接收JavaScript的时间更新 ----------------------
-# 使用隐藏的text_input接收JavaScript传递的值
-current_audio_time = st.text_input(
-    label="",
-    value=str(st.session_state.current_time),
-    key="current_audio_time",
-    label_visibility="hidden"
-)
-
-# 更新session state中的当前时间
-try:
-    st.session_state.current_time = float(current_audio_time)
-except:
-    st.session_state.current_time = 0.0
-
 # 页脚信息
 st.markdown("""
 ---
 <div style="text-align: center; color: #666; font-size: 12px;">
-    音频无缝滤波工具 | 支持播放中实时切换 | 基于Streamlit + Librosa构建
+    音频无缝滤波工具 | 支持播放中实时切换 | 基于Streamlit + Librosa构建 | 兼容所有Streamlit版本
 </div>
 """, unsafe_allow_html=True)
