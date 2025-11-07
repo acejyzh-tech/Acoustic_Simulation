@@ -10,7 +10,7 @@ import base64
 
 # 设置页面配置
 st.set_page_config(
-    page_title="音频分析与滤波工具",
+    page_title="音频分析工具",
     page_icon="🎵",
     layout="wide",
     initial_sidebar_state="expanded"
