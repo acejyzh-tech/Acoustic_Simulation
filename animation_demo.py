@@ -1,9 +1,9 @@
 import streamlit as st
 import numpy as np
 import scipy.signal as signal
-from scipy.io import wavfile
+import scipy.io.wavfile as wavfile
 import io
-import pydub
+import matplotlib.pyplot as plt
 
 # 设置页面配置
 st.set_page_config(page_title="音频滤波器", layout="centered")
@@ -11,10 +11,16 @@ st.set_page_config(page_title="音频滤波器", layout="centered")
 # 缓存音频数据
 @st.cache_data
 def load_audio(file):
-    # 使用pydub加载音频
-    audio = pydub.AudioSegment.from_file(file)
-    sample_rate = audio.frame_rate
-    samples = np.array(audio.get_array_of_samples())
+    # 使用 scipy 读取 WAV 文件
+    sample_rate, samples = wavfile.read(file)
+    
+    # 处理多通道音频（仅保留单通道）
+    if len(samples.shape) > 1:
+        samples = samples[:, 0]  # 取第一个通道
+    
+    # 确保数据类型为 int16（16 位 PCM）
+    samples = samples.astype(np.int16)
+    
     return sample_rate, samples
 
 # 缓存滤波器处理结果
@@ -69,7 +75,9 @@ if uploaded_file:
     
     # 播放音频
     st.markdown("### 🎧 音频播放")
-    st.audio(filtered_samples.tobytes(), format='audio/wav', sample_rate=sample_rate)
+    # 将 numpy 数组转换为字节流
+    audio_data = filtered_samples.tobytes()
+    st.audio(audio_data, format='audio/wav', sample_rate=sample_rate)
     
     # 显示原始和处理后音频对比
     st.markdown("### 📊 音频对比")
@@ -81,12 +89,11 @@ if uploaded_file:
     
     with col2:
         st.subheader("处理后音频")
-        st.audio(filtered_samples.tobytes(), format='audio/wav', sample_rate=sample_rate)
+        st.audio(audio_data, format='audio/wav', sample_rate=sample_rate)
     
     # 频谱分析（可选）
     if st.checkbox("📊 显示频谱分析"):
         st.markdown("### 📈 频谱图")
-        # 简单频谱显示（可扩展为更复杂的分析）
         import matplotlib.pyplot as plt
         from scipy.fft import fft
         
