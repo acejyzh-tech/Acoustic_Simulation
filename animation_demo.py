@@ -26,19 +26,25 @@ FILTER_PRESETS = {
 }
 FILTER_NAMES = list(FILTER_PRESETS.keys())
 
-# 全局状态初始化
-if 'initialized' not in st.session_state:
-    st.session_state.initialized = False
-    st.session_state.audio_data = None
-    st.session_state.sr = None
-    st.session_state.duration = 0.0
-    st.session_state.play_position = 0.0
-    st.session_state.selected_filter = FILTER_NAMES[0]
-    # 预计算缓存
-    st.session_state.filtered_audio_cache = {}
-    st.session_state.audio_base64_cache = {}
-    st.session_state.spectrogram_cache = {}
-    st.session_state.filter_version = 0  # 用于触发音频组件更新
+# ---------------------- 关键修复：全局状态初始化 ----------------------
+# 单独初始化每个全局状态，确保不会遗漏
+required_states = {
+    'initialized': False,
+    'audio_data': None,
+    'sr': None,
+    'duration': 0.0,
+    'play_position': 0.0,
+    'selected_filter': FILTER_NAMES[0],
+    'filtered_audio_cache': {},
+    'audio_base64_cache': {},
+    'spectrogram_cache': {},
+    'filter_version': 0  # 确保该状态总是被初始化
+}
+
+# 初始化缺失的状态
+for state_name, default_value in required_states.items():
+    if state_name not in st.session_state:
+        st.session_state[state_name] = default_value
 
 # ---------------------- 核心优化：缓存与预计算 ----------------------
 @lru_cache(maxsize=4)
@@ -140,7 +146,10 @@ def render_audio_player(filter_name):
     渲染音频播放器（修复key参数问题）
     """
     # 直接从缓存获取Base64编码
-    audio_base64 = st.session_state.audio_base64_cache[filter_name]
+    audio_base64 = st.session_state.audio_base64_cache.get(filter_name, None)
+    if audio_base64 is None:
+        st.warning("音频数据未准备好")
+        return
     
     # 移除不支持的key参数，通过filter_version触发更新
     st.audio(
@@ -153,7 +162,11 @@ def render_spectrogram(filter_name):
     """
     渲染声谱图（从缓存获取）
     """
-    audio_data = st.session_state.filtered_audio_cache[filter_name]
+    audio_data = st.session_state.filtered_audio_cache.get(filter_name, None)
+    if audio_data is None:
+        st.warning("声谱图数据未准备好")
+        return
+    
     audio_tuple = tuple(audio_data)
     
     # 从缓存获取或计算声谱图
@@ -242,6 +255,8 @@ with col1:
             # 使用空容器和版本号确保更新
             audio_container = st.container()
             with audio_container:
+                # 添加版本号注释，帮助Streamlit识别需要更新
+                st.markdown(f"<!-- 滤波版本: {st.session_state.filter_version} -->", unsafe_allow_html=True)
                 render_audio_player(selected_filter)
             
             # 下载功能
@@ -249,25 +264,27 @@ with col1:
             st.subheader("📥 下载")
             
             # 下载当前滤波音频
-            current_audio_b64 = st.session_state.audio_base64_cache[selected_filter]
-            filter_suffix = selected_filter.replace("Hz", "").replace("高通滤波", "").replace("无", "no").strip()
-            st.download_button(
-                label=f"下载{selected_filter}",
-                data=base64.b64decode(current_audio_b64.split(",")[1]),  # 正确解码Base64数据
-                file_name=f"filtered_{filter_suffix}.wav",
-                mime="audio/wav",
-                key=f"download_{selected_filter}"
-            )
+            current_audio_b64 = st.session_state.audio_base64_cache.get(selected_filter, None)
+            if current_audio_b64:
+                filter_suffix = selected_filter.replace("Hz", "").replace("高通滤波", "").replace("无", "no").strip()
+                st.download_button(
+                    label=f"下载{selected_filter}",
+                    data=base64.b64decode(current_audio_b64.split(",")[1]),  # 正确解码Base64数据
+                    file_name=f"filtered_{filter_suffix}.wav",
+                    mime="audio/wav",
+                    key=f"download_{selected_filter}"
+                )
             
             # 下载原始音频
-            original_b64 = st.session_state.audio_base64_cache["无滤波"]
-            st.download_button(
-                label="下载原始音频",
-                data=base64.b64decode(original_b64.split(",")[1]),
-                file_name="original_audio.wav",
-                mime="audio/wav",
-                key="download_original"
-            )
+            original_b64 = st.session_state.audio_base64_cache.get("无滤波", None)
+            if original_b64:
+                st.download_button(
+                    label="下载原始音频",
+                    data=base64.b64decode(original_b64.split(",")[1]),
+                    file_name="original_audio.wav",
+                    mime="audio/wav",
+                    key="download_original"
+                )
             
             # 滤波效果说明
             st.markdown("---")
@@ -283,7 +300,9 @@ with col1:
         except Exception as e:
             st.error(f"处理失败: {str(e)}")
             st.exception(e)
-            st.session_state.initialized = False  # 重置状态
+            # 重置所有状态，避免错误累积
+            for state_name, default_value in required_states.items():
+                st.session_state[state_name] = default_value
     else:
         # 未上传文件时的提示
         st.markdown("""
