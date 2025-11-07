@@ -20,7 +20,7 @@ st.markdown("""
 支持WAV文件上传、**播放中实时无缝切换**滤波模式，切换后自动继续播放，无任何中断。
 """, unsafe_allow_html=True)
 
-# ---------------------- 全局状态管理（关键优化） ----------------------
+# ---------------------- 全局状态管理 ----------------------
 if "current_time" not in st.session_state:
     st.session_state.current_time = 0.0  # 记录当前播放时间
 if "last_filter_option" not in st.session_state:
@@ -31,6 +31,8 @@ if "is_playing" not in st.session_state:
     st.session_state.is_playing = False  # 记录播放状态
 if "last_update_time" not in st.session_state:
     st.session_state.last_update_time = 0.0  # 上次时间更新时间
+if "total_samples" not in st.session_state:
+    st.session_state.total_samples = 0  # 总样本数（用于正确判断）
 
 # ---------------------- 核心函数定义 ----------------------
 
@@ -38,15 +40,21 @@ if "last_update_time" not in st.session_state:
 def load_and_preprocess_audio(file_bytes):
     """
     加载音频并预计算所有滤波版本
-    返回格式：{滤波类型: (音频数据, 采样率, 总时长)}
+    返回格式：{滤波类型: (音频数据, 采样率, 总时长, 总样本数)}
     """
     # 加载原始音频
     y, sr = librosa.load(BytesIO(file_bytes), sr=None, mono=False)  # 保留原始通道数
     duration = librosa.get_duration(y=y, sr=sr)
     
+    # 计算总样本数（处理单通道/多通道）
+    if y.ndim == 2:
+        total_samples = y.shape[1]  # 多通道：(channels, samples)
+    else:
+        total_samples = len(y)      # 单通道：(samples,)
+    
     # 存储所有处理后的音频
     processed_audio = {
-        "无滤波": (y, sr, duration)
+        "无滤波": (y, sr, duration, total_samples)
     }
     
     # 定义高通滤波函数（支持多通道）
@@ -68,7 +76,7 @@ def load_and_preprocess_audio(file_bytes):
     # 预计算各频率高通滤波
     for cutoff in [100, 200, 500]:
         filtered_y = apply_highpass(y, cutoff, sr)
-        processed_audio[f"{cutoff}Hz高通滤波"] = (filtered_y, sr, duration)
+        processed_audio[f"{cutoff}Hz高通滤波"] = (filtered_y, sr, duration, total_samples)
     
     return processed_audio
 
@@ -83,15 +91,23 @@ def audio_to_bytes(y, sr):
     return buffer
 
 def get_audio_segment_bytes(y, sr, start_time=0.0):
-    """从指定时间点截取音频片段并转换为字节流"""
+    """从指定时间点截取音频片段并转换为字节流（修复数组判断问题）"""
     start_sample = int(start_time * sr)
-    if start_sample < len(y):
+    
+    # 正确判断样本数（修复核心错误）
+    if y.ndim == 2:
+        total_samples = y.shape[1]
+    else:
+        total_samples = len(y)
+    
+    # 确保起始样本不超过总样本数
+    if start_sample < total_samples and start_sample >= 0:
         if y.ndim == 2:
             y_segment = y[:, start_sample:]  # 多通道：(channels, samples)
         else:
             y_segment = y[start_sample:]     # 单通道：(samples,)
     else:
-        y_segment = y
+        y_segment = y  # 返回完整音频
     
     return audio_to_bytes(y_segment, sr)
 
@@ -164,11 +180,12 @@ if uploaded_file is not None:
     
     # 预计算所有滤波版本（使用缓存）
     processed_audio = load_and_preprocess_audio(file_bytes)
-    y_original, sr, total_duration = processed_audio["无滤波"]
+    y_original, sr, total_duration, total_samples = processed_audio["无滤波"]
+    st.session_state.total_samples = total_samples
     
     # 预生成所有完整音频的字节流（避免重复转换）
     if not st.session_state.audio_data:
-        for filter_name, (y_data, y_sr, _) in processed_audio.items():
+        for filter_name, (y_data, y_sr, _, _) in processed_audio.items():
             st.session_state.audio_data[filter_name] = audio_to_bytes(y_data, y_sr)
     
     # 显示音频信息
@@ -177,6 +194,7 @@ if uploaded_file is not None:
     - 采样率：{sr} Hz
     - 时长：{total_duration:.2f} 秒
     - 通道数：{y_original.shape[0] if y_original.ndim == 2 else 1}
+    - 总样本数：{total_samples:,}
     """)
     
     # 滤波模式选择（单选按钮）
@@ -191,7 +209,7 @@ if uploaded_file is not None:
     # 注入JavaScript监听
     inject_audio_listener()
     
-    # 隐藏的输入框，用于接收JavaScript传递的状态（关键）
+    # 隐藏的输入框，用于接收JavaScript传递的状态
     audio_play_state = st.text_input(
         label="", value="false", key="audio_play_state", label_visibility="hidden"
     )
@@ -199,7 +217,7 @@ if uploaded_file is not None:
         label="", value="0.0", key="audio_current_time", label_visibility="hidden"
     )
     
-    # 更新全局状态（关键优化：避免频繁更新）
+    # 更新全局状态（避免频繁更新）
     current_time = st.session_state.current_time
     try:
         new_current_time = float(audio_current_time)
@@ -207,35 +225,33 @@ if uploaded_file is not None:
         
         # 仅在时间变化超过0.1秒或播放状态变化时更新
         if abs(new_current_time - current_time) > 0.1 or new_is_playing != st.session_state.is_playing:
+            # 确保时间不超过音频时长
+            new_current_time = min(new_current_time, total_duration)
+            new_current_time = max(new_current_time, 0.0)
+            
             st.session_state.current_time = new_current_time
             st.session_state.is_playing = new_is_playing
             st.session_state.last_update_time = time.time()
-    except:
-        pass
+    except Exception as e:
+        st.error(f"状态更新错误：{str(e)}")
     
-    # 处理滤波模式切换（核心改进）
+    # 处理滤波模式切换
     current_filter = filter_option
-    need_update_audio = False
-    
     if current_filter != st.session_state.last_filter_option:
-        # 切换了滤波模式
         st.session_state.last_filter_option = current_filter
-        need_update_audio = True
     
     # 获取当前音频数据
-    y_filtered, sr, _ = processed_audio[current_filter]
+    y_filtered, sr, _, _ = processed_audio[current_filter]
     
-    # 生成当前时间点的音频片段
+    # 生成当前时间点的音频片段（修复后的函数）
     current_play_time = st.session_state.current_time
     audio_segment_bytes = get_audio_segment_bytes(y_filtered, sr, current_play_time)
     
-    # 音频播放区域（使用动态更新，不刷新整个页面）
+    # 音频播放区域（动态更新）
     st.subheader("播放音频")
     audio_container = st.container()
     
-    # 关键：使用空占位符动态更新音频，不触发页面刷新
     with audio_container:
-        # 始终显示当前的音频片段
         st.audio(
             audio_segment_bytes,
             format="audio/wav",
@@ -245,7 +261,8 @@ if uploaded_file is not None:
     # 显示播放进度条和时间
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        progress = min(current_play_time / total_duration if total_duration > 0 else 0.0, 1.0)
+        progress = current_play_time / total_duration if total_duration > 0 else 0.0
+        progress = min(progress, 1.0)
         st.progress(progress)
         st.markdown(f"""
         <div style="text-align: center; font-size: 14px;">
@@ -286,10 +303,15 @@ if uploaded_file is not None:
             mime="audio/wav"
         )
     
-    # 自动更新：当播放状态为播放中时，定期更新音频片段（关键）
-    if st.session_state.is_playing and time.time() - st.session_state.last_update_time > 0.5:
-        # 每0.5秒自动更新一次，确保音频连续
-        st.rerun(scope="component")  # 仅刷新组件，不刷新整个页面
+    # 自动更新：播放中定期刷新音频片段
+    if st.session_state.is_playing:
+        # 检查是否需要更新（避免过于频繁）
+        if time.time() - st.session_state.last_update_time > 0.3:
+            # 兼容不同Streamlit版本
+            try:
+                st.rerun(scope="component")  # Streamlit 1.30+
+            except:
+                st.rerun()  # 旧版本降级使用
 
 else:
     # 未上传文件时的提示
