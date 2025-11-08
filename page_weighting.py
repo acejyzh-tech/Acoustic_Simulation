@@ -30,7 +30,7 @@ if st.button("计算计权值"):
         )
         
         # 显示结果
-    st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, use_container_width=True)
     
     except ValueError:
         st.error("请输入有效的数值！")
