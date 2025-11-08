@@ -26,13 +26,11 @@ if st.button("计算计权值"):
             y=alt.Y('A计权值:Q', title='A计权值 (dB)'),
             tooltip=['频率:Q', 'A计权值:Q']
         ).properties(
-            title='数据正弦值折线图'
+            title='计权值数据（）'
         )
         
         # 显示结果
-        
-        st.subheader("计权曲线")
-        st.altair_chart(chart, use_container_width=True)
-        
+    st.altair_chart(chart, use_container_width=True)
+    
     except ValueError:
         st.error("请输入有效的数值！")
