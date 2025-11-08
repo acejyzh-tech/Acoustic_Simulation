@@ -28,7 +28,7 @@ def run() -> None:
                 st.Page(
                     dir_path / "page_weighting.py",
                     title="计算A计权值",
-                    icon="A",
+                    icon=":material/show_chart:",
                 ),
                 st.Page(
                     dir_path / "page_fr_simulation.py",
