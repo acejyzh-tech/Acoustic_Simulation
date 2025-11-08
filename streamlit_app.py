@@ -28,10 +28,10 @@ def run() -> None:
                 st.Page(
                     dir_path / "page_weighting.py",
                     title="计算A计权值",
-                    icon=":material/show_chart:",
+                    icon="A",
                 ),
                 st.Page(
-                    dir_path / "plotting_demo.py",
+                    dir_path / "page_fr_simulation.py",
                     title="麦克风集中参数法仿真",
                     icon=":material/show_chart:",
                 ),
