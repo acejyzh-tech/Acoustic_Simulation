@@ -24,6 +24,12 @@ def run() -> None:
     page = st.navigation(
         {
             "JYZhang 的声学工具箱": [
+
+                st.Page(
+                    dir_path / "page_weighting.py",
+                    title="计算A计权值",
+                    icon=":material/show_chart:",
+                ),
                 st.Page(
                     dir_path / "plotting_demo.py",
                     title="麦克风集中参数法仿真",
@@ -32,11 +38,6 @@ def run() -> None:
                 st.Page(
                     dir_path / "animation_demo.py",
                     title="由低衰和谐振峰点生成麦克风频响曲线",
-                    icon=":material/show_chart:",
-                ),
-                st.Page(
-                    dir_path / "page_weighting.py",
-                    title="计算A计权值",
                     icon=":material/show_chart:",
                 ),
             ]
