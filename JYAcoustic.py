@@ -62,11 +62,11 @@ def parallel(R1,R2): return R1*R2/(R1+R2)
 def omg(f): return 2 * PI * f  # 计算圆频率（Hz）
 def beta(f): return np.sqrt(NIU/omg(f))  # 计算某个频率声音的边界层厚度
 def A_ro(f, f_ro): return 1/np.sqrt(1+(f_ro/f)**2)  # 低衰频率为f_ro，频率f时的低衰值
-def f0(C, M): return 1/2/PI/np.sqrt(C*M)   # 由顺性和惯性计算系统固有频率
-def Qm(C, M, R): return np.sqrt(M/C)/R  # 计算振动系统的品质因数
+def A_hr(z, Qm): return Qm/np.sqrt(z**2+(z**2-1)**2*Qm**2)  # 由频率比和品质因数，计算幅频谐响应
 def fr(C, M, R): return f0(C, M) * np.sqrt(1-1/2/Qm(C,M,R)**2)   # 计算谐振频率
 def Ar(C, M, R): return 2*Qm(C,M,R)**2/np.sqrt(4*Qm(C,M,R)**2-1)  # 计算谐振峰高度
-def A_hr(z, Qm): return Qm/np.sqrt(z**2+(z**2-1)**2*Qm**2)  # 由频率比和品质因数，计算幅频谐响应
+def f0(C, M): return 1/2/PI/np.sqrt(C*M)   # 由顺性和惯性计算系统固有频率
+def Qm(C, M, R): return np.sqrt(M/C)/R  # 计算振动系统的品质因数
 def JN(R): return np.sqrt(4*KB*T0*R)  # 计算阻值下的 J-N 噪声密度
 
 '''
