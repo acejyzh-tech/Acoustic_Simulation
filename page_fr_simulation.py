@@ -4,6 +4,8 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
+freq0 = ""
+for i in range(401): freq0 += str(10**(i/100+1))+"\n"
 input_data = st.text_area("请输入你想要计算的频率点数据（每行一个频率值）", freq0)
 para_data = st.text_area("请输入麦克风的参数，每行一个，格式为（编号:声孔直径（$mm$）,声孔长度（$mm$））", freq0)
 
