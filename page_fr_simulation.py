@@ -4,7 +4,7 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
-mics_data = st.text_area("请输入麦克风的参数，每行一个，格式为（编号:声孔直径（$mm$）,声孔长度（$mm$））", "MIC_0,0.3,0.2.0.15,1.3,1.85,180,280,6.0")
+mics_para = st.text_area("请输入麦克风的参数，每行一个，格式为（编号:声孔直径（$mm$）,声孔长度（$mm$））", "MIC_0,0.3,0.2.0.15,1.3,1.85,180,280,6.0")
 for mic_para in mics_para.splitlines():
     paras = mic_para.split(",")
     st.print(paras)
