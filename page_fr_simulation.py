@@ -4,10 +4,6 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
-# 正文
-
-st.set_page_config(page_title="Plotting demo", page_icon=":material/show_chart:")
-st.title("Plotting demo")
 st.write(
     """
     This demo illustrates a combination of plotting and animation with
@@ -15,6 +11,7 @@ st.write(
     5 seconds. Enjoy!
     """
 )
+
 
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 with st.sidebar:
