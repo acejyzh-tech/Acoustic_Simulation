@@ -12,12 +12,12 @@ input_data = st.text_area("请输入频率点数据（每行一个频率值）",
 if st.button("计算计权值"):
     try:
         numbers = [float(line.strip()) for line in input_data.splitlines() if line.strip()]
-        sine_values = [ac.sin(num) for num in numbers]  # 计算计权值
+        values = [ac.A_weight(num) for num in numbers]  # 计算计权值
         
         # 创建 DataFrame
         df = pd.DataFrame({
             '频率': numbers,
-            'A计权值': sine_values
+            'A计权值': values
         })
         
         # 使用 Altair 绘制折线图
