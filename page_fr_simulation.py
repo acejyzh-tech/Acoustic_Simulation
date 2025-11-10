@@ -48,7 +48,7 @@ for col in curve_columns:
     chart = alt.Chart(Sensitivity).mark_line().encode(
         x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),  # x轴
         y=alt.Y(f"{col}:Q", title=col),  # 每条曲线的y轴
-        color=alt.Color(f"{col}:N", legend=None)  # 用颜色区分不同曲线
+        # color=alt.Color(f"{col}:N", legend=None)  # 用颜色区分不同曲线
     )
     charts.append(chart)
 
