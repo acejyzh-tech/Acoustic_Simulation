@@ -18,7 +18,6 @@ df = pd.DataFrame(paras, columns=
                  index = names)
 st.dataframe(df) 
 
-
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 Sensitivity = pd.DataFrame({'Freq': freqs, })
 Noise = pd.DataFrame({'Freq': freqs, })
@@ -40,9 +39,8 @@ for i, mic in enumerate(MICS):
         mic.AH.M = ac.Ma(f=f, D=paras[i][0], L=paras[i][1])
         sens.append(ac.dB(mic.Sens(f)))
         noise.append(ac.dB(mic.N_total(f)))
-    Sensitivity[str(i)] = sens
-    Noise[str(i)] = noise
-# st.dataframe(Sensitivity) 
+    Sensitivity[names[i]] = sens
+    Noise[names[i]] = noise
 
 # 绘制频响曲线
 curve_columns = [col for col in Sensitivity.columns if col != 'Freq']
