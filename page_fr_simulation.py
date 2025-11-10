@@ -45,7 +45,7 @@ st.dataframe(Sensitivity)
 curve_columns = [col for col in Sensitivity.columns if col != 'Freq']
 charts = []
 for col in curve_columns:
-    chart = alt.Chart(data).mark_line().encode(
+    chart = alt.Chart(Sensitivity).mark_line().encode(
         x="Freq:Q",  # x轴
         y=alt.Y(f"{col}:Q", title=col),  # 每条曲线的y轴
         color=alt.Color(f"{col}:N", legend=None)  # 用颜色区分不同曲线
