@@ -27,23 +27,22 @@ for mic_para in paras:
     MICS.append(ac.MIC())
 # 计算麦克风频响
 for i, mic in enumerate(MICS):
-    mic.SD.C = paras[i][4]
-    mic.VH.R = paras[i][5]
-    mic.BH.R = paras[i][6]
-    mic.BH.M = paras[i][7]
-    mic.FC.C = ac.Ca(paras[i][2])
-    mic.BC.C = ac.Ca(paras[i][3])
+    mic.FC.C = ac.Ca(paras[i][2])*1e-15
+    mic.BC.C = ac.Ca(paras[i][3])*1e-15
+    mic.SD.C = paras[i][4]*1e-15
+    mic.VH.R = paras[i][5]*1e9
+    mic.BH.R = paras[i][6]*1e6
+    mic.BH.M = paras[i][7]*1e3
     sens, noise = [], []  # 初始化数组
     for f in freqs:
-        mic.AH.R = ac.Ra(f=f, D=paras[i][0], L=paras[i][1])
-        mic.AH.M = ac.Ma(f=f, D=paras[i][0], L=paras[i][1])
+        mic.AH.R = ac.Ra(f=f, D=paras[i][0]*1e-3, L=paras[i][1]*1e-3)
+        mic.AH.M = ac.Ma(f=f, D=paras[i][0]*1e-3, L=paras[i][1]*1e-3)
         sens.append(ac.dB(mic.Sens(f)))
         noise.append(ac.dB(mic.N_total(f)))
     Sensitivity[names[i]] = sens
     Noise[names[i]] = noise
 
 # 绘制频响曲线
-curve_columns = [col for col in Sensitivity.columns if col != 'Freq']
 charts = []
 for col in names:
     chart = alt.Chart(Sensitivity).mark_line().encode(
