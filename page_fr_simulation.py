@@ -14,7 +14,7 @@ paras = [row for row in paras if all(not cell is None for cell in row)]
 df = pd.DataFrame(paras, columns=
                   ["声孔直径", "声孔长度（$mm$）", "前腔体积（$mm^3$）", "后腔体积（$mm^3$）", 
                    "振膜声顺（$fF$）", "泄气孔声阻尼（$G\Omega$）", "薄流层声阻尼（$M\Omega$）", "薄流层声质量（$KH$）"])
-st.dataframe(df, border="horizontal")
+st.dataframe(df) # , border="horizontal")
 
 for mic_para in paras:
     pass
