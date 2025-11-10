@@ -4,7 +4,9 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
-input_para = st.text_area(":material/Settings: 请输入麦克风的参数，每行一个，格式为（编号:声孔直径（$mm$）,声孔长度（$mm$））", "MIC_0,0.3,0.2.0.15,1.3,1.85,180,280,6.0")
+input_para = st.text_area(
+    ":material/Settings: 请输入麦克风的参数：", 
+    "0.3,0.2.0.15,1.3,1.85,180,280,6.0")
 rows = input_para.split('\n')
 paras = [row.split(',') for row in rows]
 paras = [[float(item) if isinstance(item, str) and item.replace('.', '', 1).isdigit() else None for item in row] for row in paras]
