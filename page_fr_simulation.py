@@ -23,7 +23,7 @@ Noise = pd.DataFrame({'Freq': freqs, })
 MICS = []    # 建立麦克风组
 for mic_para in paras:
     MICS.append(ac.MIC())
-
+# 计算麦克风频响
 for i, mic in enumerate(MICS):
     mic.SD.C = paras[i][4]
     mic.VH.R = paras[i][5]
@@ -41,11 +41,13 @@ for i, mic in enumerate(MICS):
     Noise[str(i)] = noise
 st.dataframe(Sensitivity) 
 
-
-chart = alt.Chart(Sensitivity).mark_line().encode(
+# 绘制频响曲线
+chart = ()
+chart += alt.Chart(Sensitivity).mark_line().encode(
 x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
 y=alt.Y('0', title='dB')
-) + alt.Chart(Sensitivity).mark_line().encode(
+)
+chart += alt.Chart(Sensitivity).mark_line().encode(
 x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
 y=alt.Y('1', title='dB')
 )
