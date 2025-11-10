@@ -14,7 +14,8 @@ df = pd.DataFrame(paras, columns=["D_AH", "L_AH", "V_FC", "V_BC", "C_SD", "R_VH"
 # df = df.dropna(how='any')
 st.dataframe(df)
 
-for mic_para in paras
+for mic_para in paras:
+    pass
 
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 with st.sidebar:
