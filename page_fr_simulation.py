@@ -43,15 +43,22 @@ for i, mic in enumerate(MICS):
     Noise[names[i]] = noise
 
 # 绘制频响曲线
-charts_sens = []
+charts_sens, charts_noise = []
 colors = ["#3b6291", "#943c39", "#779043", "#624c7c", "#388498", "#bf7334", "#3f689", "#9c403d", "#7d9847", "#675083", "#3b8ba1", "#c97937"]
 for i, col in enumerate(names):
-    chart = alt.Chart(Sensitivity).mark_line().encode(
+    chart1 = alt.Chart(Sensitivity).mark_line().encode(
         x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
         y=alt.Y(f"{col}:Q", title=col),
-        color=alt.value(colors[i])  # 用颜色区分不同曲线
+        color=alt.value(colors[i])
     )
-    charts.append(chart)
+    chart2 = alt.Chart(Sensitivity).mark_line().encode(
+        x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
+        y=alt.Y(f"{col}:Q", title=col),
+        color=alt.value(colors[i])
+    )
+    charts_sens.append(chart)
+    charts_noise.append(chart)
 
 # 绘制曲线
 st.altair_chart(alt.layer(*charts_sens))
+st.altair_chart(alt.layer(*charts_noise))
