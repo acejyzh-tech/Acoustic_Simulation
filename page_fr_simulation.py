@@ -12,8 +12,7 @@ paras = [row.split(',') for row in rows]
 paras = [[float(item) if isinstance(item, str) and item.replace('.', '', 1).isdigit() else None for item in row] for row in paras]
 paras = [row for row in paras if all(not cell is None for cell in row)]
 df = pd.DataFrame(paras, columns=["D_AH", "L_AH", "V_FC", "V_BC", "C_SD", "R_VH", "R_BH", "M_BH"])
-# df = df.dropna(how='any')
-st.dataframe(df)
+st.table(df)
 
 for mic_para in paras:
     pass
