@@ -28,8 +28,8 @@ for mic_para in paras:
 # 计算麦克风频响
 for i, mic in enumerate(MICS):
     mic.FC.C = ac.Ca(paras[i][2])*1e-15
-    mic.BC.C = ac.Ca(paras[i][3])*1e-15
-    mic.SD.C = paras[i][4]*1e-15
+    mic.BC.C = ac.Ca(paras[i][3])*1e-9
+    mic.SD.C = paras[i][4]*1e-9
     mic.VH.R = paras[i][5]*1e9
     mic.BH.R = paras[i][6]*1e6
     mic.BH.M = paras[i][7]*1e3
