@@ -11,7 +11,7 @@ rows = input_para.split('\n')
 paras = [row.split(',') for row in rows]
 paras = [[float(item) if isinstance(item, str) and item.replace('.', '', 1).isdigit() else None for item in row] for row in paras]
 paras = [row for row in paras if all(not cell is None for cell in row)]
-df = pd.DataFrame(paras, columns=["声孔直径（$mm$）", "声孔长度（$mm$）", "前腔体积（$mm^3$）", "后腔体积（$mm^3$）",
+df = pd.DataFrame(paras, columns=[":blue[声孔直径（$mm$）]", "声孔长度（$mm$）", "前腔体积（$mm^3$）", "后腔体积（$mm^3$）",
                                   "振膜声顺（$fF$）", "泄气孔声阻尼（$G\Omega$）", "薄流层声阻尼（$M\Omega$）", "薄流层声质量（$KH$）"])
 st.table(df, border="horizontal")
 
