@@ -51,7 +51,7 @@ for i, col in enumerate(names):
         y=alt.Y(f"{col}:Q", title=col),
         color=alt.value(colors[i])
     )
-    chart2 = alt.Chart(Sensitivity).mark_line().encode(
+    chart2 = alt.Chart(Noise).mark_line().encode(
         x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
         y=alt.Y(f"{col}:Q", title=col),
         color=alt.value(colors[i])
