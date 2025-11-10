@@ -43,7 +43,7 @@ for i, mic in enumerate(MICS):
     Noise[names[i]] = noise
 
 # 绘制频响曲线
-charts_sens, charts_noise = []
+charts_sens, charts_noise = [], []
 colors = ["#3b6291", "#943c39", "#779043", "#624c7c", "#388498", "#bf7334", "#3f689", "#9c403d", "#7d9847", "#675083", "#3b8ba1", "#c97937"]
 for i, col in enumerate(names):
     chart1 = alt.Chart(Sensitivity).mark_line().encode(
