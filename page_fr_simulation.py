@@ -11,7 +11,7 @@ rows = input_para.split('\n')
 paras = [row.split(',') for row in rows]
 paras = [[float(item) if isinstance(item, str) and item.replace('.', '', 1).isdigit() else None for item in row] for row in paras]
 paras = [row for row in paras if all(cell is not None for cell in row) and len(row)==8]
-names = [str(i)+"#" for i in len(paras)]
+names = [str(i+1)+"#" for i in range(len(paras))]
 df = pd.DataFrame(paras, columns=
                   ["声孔直径", "声孔长度", "前腔体积", "后腔体积", 
                    "振膜声顺", "泄气孔声阻尼", "薄流层声阻尼", "薄流层声质量"],
