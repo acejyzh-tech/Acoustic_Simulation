@@ -48,12 +48,12 @@ colors = ["#3b6291", "#943c39", "#779043", "#624c7c", "#388498", "#bf7334", "#3f
 for i, col in enumerate(names):
     chart1 = alt.Chart(Sensitivity).mark_line().encode(
         x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
-        y=alt.Y(f"{col}:Q", title=col),
+        y=alt.Y(f"{col}:Q", title="灵敏度（dB）"),
         color=alt.value(colors[i])
     )
     chart2 = alt.Chart(Noise).mark_line().encode(
         x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
-        y=alt.Y(f"{col}:Q", title=col),
+        y=alt.Y(f"{col}:Q", title="噪声谱（dB）"),
         color=alt.value(colors[i])
     )
     charts_sens.append(chart1)
