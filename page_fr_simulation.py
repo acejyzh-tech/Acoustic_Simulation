@@ -42,7 +42,7 @@ for i, mic in enumerate(MICS):
 st.dataframe(Sensitivity) 
 
 # 绘制频响曲线
-curve_columns = [col for col in data.columns if col != 'Freq']
+curve_columns = [col for col in Sensitivity.columns if col != 'Freq']
 charts = []
 for col in curve_columns:
     chart = alt.Chart(data).mark_line().encode(
