@@ -44,11 +44,12 @@ for i, mic in enumerate(MICS):
 
 # 绘制频响曲线
 charts = []
-for col in names:
+colors = ["3b6291", "943c39", "779043", "624c7c", "388498", "bf7334", "3f689", "9c403d", "7d9847", "675083", "3b8ba1", "c97937"]
+for i, col in enumerate(names):
     chart = alt.Chart(Sensitivity).mark_line().encode(
         x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
         y=alt.Y(f"{col}:Q", title=col),
-        color=alt.Color(f"{col}:N", legend=None)  # 用颜色区分不同曲线
+        color=alt.Color(colors[i])  # 用颜色区分不同曲线
     )
     charts.append(chart)
 
