@@ -57,3 +57,4 @@ final_chart = alt.layer(*charts).properties(
     title="多条曲线图表（中文标题）"  # 设置中文标题
 ).interactive()  # 启用交互功能
 
+st.altair_chart(final_chart)
