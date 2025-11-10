@@ -8,6 +8,7 @@ input_para = st.text_area(":material/Settings: 请输入麦克风的参数，每
 rows = input_para.split('\n')
 paras = [float(row.split(',')) for row in rows]
 df = pd.DataFrame(paras, columns=["D_AH", "L_AH", "V_FC", "V_BC", "C_SD", "R_VH", "R_BH", "M_BH"])
+df = [float(item) if isinstance(item, str) and item.replace('.', '', 1).isdigit() else None for item in row] for row in df
 df = df.dropna(how='any')
 st.dataframe(df)
 
