@@ -43,12 +43,13 @@ st.dataframe(Sensitivity)
 
 # 绘制频响曲线
 chart = ()
-chart += alt.Chart(Sensitivity).mark_line().encode(
+
+chart += (alt.Chart(Sensitivity).mark_line().encode(
 x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
-y=alt.Y('0', title='dB')
-)
-chart += alt.Chart(Sensitivity).mark_line().encode(
+y=alt.Y('0', title='dB')),)
+
+chart += (alt.Chart(Sensitivity).mark_line().encode(
 x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
-y=alt.Y('1', title='dB')
-)
+y=alt.Y('1', title='dB')),)
+
 st.altair_chart(chart)
