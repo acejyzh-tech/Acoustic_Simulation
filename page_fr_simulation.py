@@ -56,8 +56,8 @@ for i, col in enumerate(names):
         y=alt.Y(f"{col}:Q", title=col),
         color=alt.value(colors[i])
     )
-    charts_sens.append(chart)
-    charts_noise.append(chart)
+    charts_sens.append(chart1)
+    charts_noise.append(chart2)
 
 # 绘制曲线
 st.altair_chart(alt.layer(*charts_sens))
