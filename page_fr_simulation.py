@@ -4,9 +4,9 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
-mics_para = st.text_area(":material/Settings: 请输入麦克风的参数，每行一个，格式为（编号:声孔直径（$mm$）,声孔长度（$mm$））", "MIC_0,0.3,0.2.0.15,1.3,1.85,180,280,6.0")
-for mic_para in mics_para.splitlines():
-    paras = mic_para.split(",")
+input_para = st.text_area(":material/Settings: 请输入麦克风的参数，每行一个，格式为（编号:声孔直径（$mm$）,声孔长度（$mm$））", "MIC_0,0.3,0.2.0.15,1.3,1.85,180,280,6.0")
+rows = input_para.split('\n')
+paras = [row.split(',') for row in rows]
 df = pd.DataFrame(paras, columns=["Name", "D_AH", "L_AH", "V_FC", "V_BC", "C_SD", "R_VH", "R_BH", "M_BH"])
 st.dataframe(df)
 
