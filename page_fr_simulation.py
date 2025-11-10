@@ -46,15 +46,15 @@ curve_columns = [col for col in Sensitivity.columns if col != 'Freq']
 charts = []
 for col in curve_columns:
     chart = alt.Chart(Sensitivity).mark_line().encode(
-        x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),  # x轴
-        y=alt.Y(f"{col}:Q", title=col),  # 每条曲线的y轴
+        x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
+        y=alt.Y(f"{col}:Q", title=col),
         # color=alt.Color(f"{col}:N", legend=None)  # 用颜色区分不同曲线
     )
     charts.append(chart)
 
 # 叠加所有曲线
 final_chart = alt.layer(*charts).properties(
-    title="多条曲线图表（中文标题）"  # 设置中文标题
+    title="频响曲线"
 ).interactive()  # 启用交互功能
 
 st.altair_chart(final_chart)
