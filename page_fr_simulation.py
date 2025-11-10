@@ -43,7 +43,7 @@ for i, mic in enumerate(MICS):
     Noise[names[i]] = noise
 
 # 绘制频响曲线
-charts = []
+charts_sens = []
 colors = ["#3b6291", "#943c39", "#779043", "#624c7c", "#388498", "#bf7334", "#3f689", "#9c403d", "#7d9847", "#675083", "#3b8ba1", "#c97937"]
 for i, col in enumerate(names):
     chart = alt.Chart(Sensitivity).mark_line().encode(
@@ -53,9 +53,5 @@ for i, col in enumerate(names):
     )
     charts.append(chart)
 
-# 叠加所有曲线
-final_chart = alt.layer(*charts).properties(
-    title="频响曲线"
-).interactive()  # 启用交互功能
-
-st.altair_chart(alt.layer(*charts))
+# 绘制曲线
+st.altair_chart(alt.layer(*charts_sens))
