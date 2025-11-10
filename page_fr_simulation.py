@@ -58,4 +58,4 @@ final_chart = alt.layer(*charts).properties(
     title="频响曲线"
 ).interactive()  # 启用交互功能
 
-st.altair_chart(charts)
+st.altair_chart(alt.layer(*charts))
