@@ -25,16 +25,16 @@ for mic_para in paras:
     MICS.append(ac.MIC())
 
 for i, mic in enumerate(MICS):
-    mic.SD.C = C_SD
-    mic.VH.R = R_VH
-    mic.BH.R = R_BH
-    mic.BH.M = M_BH
-    mic.FC.C = ac.Ca(V_FC)
-    mic.BC.C = ac.Ca(V_BC)
+    mic.SD.C = paras[i][4]
+    mic.VH.R = paras[i][5]
+    mic.BH.R = paras[i][6]
+    mic.BH.M = paras[i][7]
+    mic.FC.C = ac.Ca(paras[i][2])
+    mic.BC.C = ac.Ca(paras[i][3])
     sens, noise = [], []  # 初始化数组
     for f in freqs:
-        mic.AH.R = ac.Ra(f=f, D=D_AH, L=L_AH)
-        mic.AH.M = ac.Ma(f=f, D=D_AH, L=L_AH)
+        mic.AH.R = ac.Ra(f=f, D=paras[i][0], L=paras[i][1])
+        mic.AH.M = ac.Ma(f=f, D=paras[i][0], L=paras[i][1])
         sens.append(ac.dB(mic.Sens(f)))
         noise.append(ac.dB(mic.N_total(f)))
     Sensitivity[str(i)] = sens
