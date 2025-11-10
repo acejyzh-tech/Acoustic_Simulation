@@ -14,12 +14,35 @@ paras = [row for row in paras if all(cell is not None for cell in row) and len(r
 df = pd.DataFrame(paras, columns=
                   ["声孔直径", "声孔长度", "前腔体积", "后腔体积", 
                    "振膜声顺", "泄气孔声阻尼", "薄流层声阻尼", "薄流层声质量"])
-st.dataframe(df) # , border="horizontal")
-
-for mic_para in paras:
-    pass
+st.dataframe(df) 
 
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
+Sensitivity = pd.DataFrame({'Freq': freqs, })
+Noise = pd.DataFrame({'Freq': freqs, })
+
+MICS = []    # 建立麦克风组
+for mic_para in paras:
+    MICS.append(ac.MIC())
+
+for i, mic in enumerate(MICS):
+    mic.SD.C = C_SD
+    mic.VH.R = R_VH
+    mic.BH.R = R_BH
+    mic.BH.M = M_BH
+    mic.FC.C = ac.Ca(V_FC)
+    mic.BC.C = ac.Ca(V_BC)
+    sens, noise = [], []  # 初始化数组
+    for f in freqs:
+        mic.AH.R = ac.Ra(f=f, D=D_AH, L=L_AH)
+        mic.AH.M = ac.Ma(f=f, D=D_AH, L=L_AH)
+        sens.append(ac.dB(mic.Sens(f)))
+        noise.append(ac.dB(mic.N_total(f)))
+    Sensitivity[str(i)] = sens
+    Noise[str(i)] = noise
+st.dataframe(Sensitivity) 
+
+
+'''
 with st.sidebar:
     st.markdown(':material/Settings: 参数设置')
 
@@ -89,3 +112,4 @@ x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
 y=alt.Y('Total Noise', title='dB')
 )
 st.altair_chart(chart)
+'''
