@@ -42,11 +42,11 @@ for i, mic in enumerate(MICS):
 st.dataframe(Sensitivity) 
 
 
-chart = alt.Chart(df).mark_line().encode(
+chart = alt.Chart(Sensitivity).mark_line().encode(
 x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
-y=alt.Y('Sensitivity', title='dB')
+y=alt.Y('0', title='dB')
 ) + alt.Chart(df).mark_line().encode(
 x=alt.X('Freq', scale=alt.Scale(type='log'), title='频率（Hz）'),
-y=alt.Y('Total Noise', title='dB')
+y=alt.Y('1', title='dB')
 )
 st.altair_chart(chart)
