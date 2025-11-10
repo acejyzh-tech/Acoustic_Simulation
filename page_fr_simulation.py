@@ -62,4 +62,4 @@ for i, col in enumerate(names):
 # 绘制曲线
 st.altair_chart(alt.layer(*charts_sens))
 st.altair_chart(alt.layer(*charts_noise))
-st.toast("Hip!")
+st.toast("计算完成!")
