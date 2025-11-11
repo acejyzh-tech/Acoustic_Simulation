@@ -22,25 +22,6 @@ st.session_state[log_key] = ""
 log_debug(f"更新数据..."+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
 # 参数输入区
-script = """
-<script>
-function filterInput(event) {
-    // 使用正则表达式过滤非数字和半角逗号的字符
-    event.target.value = event.target.value.replace(/[^0-9,]/g, '');
-}
-// 监听输入事件
-document.querySelectorAll('textarea').forEach(textarea => {
-    textarea.addEventListener('input', filterInput);
-});
-</script>
-"""
-
-# 渲染文本区域
-st.text_area("请输入数字和半角逗号", key="number_input")
-
-# 注入自定义脚本
-st.components.v1.html(script)
-
 with parabox.container():
     input_para = st.text_area(
         ":material/Settings: 请输入麦克风的参数：", 
@@ -56,7 +37,7 @@ with parabox.container():
                      index = names)
     st.button("计算", type="primary")
     st.dataframe(df) 
-    log_debug(df)
+    log_debug(df.to_string(header=False))
     log_debug(f"计算中...")
 
 with curvebox.container():
