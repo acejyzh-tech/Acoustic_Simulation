@@ -34,6 +34,8 @@ with parabox.container():
                        "振膜声顺", "泄气孔声阻尼", "薄流层声阻尼", "薄流层声质量"],
                      index = names)
     st.dataframe(df) 
+    log_debug(df)
+
 
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 Sensitivity = pd.DataFrame({'Freq': freqs, })
