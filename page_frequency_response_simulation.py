@@ -46,6 +46,8 @@ with curvebox.container():
     freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
     Sensitivity = pd.DataFrame({'Freq': freqs, })
     Noise = pd.DataFrame({'Freq': freqs, })
+    Phase = pd.DataFrame({'Freq': freqs, })
+
     
     MICS = []    # 建立麦克风组
     for mic_para in paras:
