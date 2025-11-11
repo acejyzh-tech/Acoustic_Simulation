@@ -73,6 +73,6 @@ with tab3:
 st.toast("计算完成!")
 
 if 'key' not in st.session_state:
-    st.session_state.key = 'debug_logs'
+    st.session_state.key = debug_logs
 
 st.write(st.session_state.key)
