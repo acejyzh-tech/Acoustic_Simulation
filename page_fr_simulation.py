@@ -60,6 +60,8 @@ for i, col in enumerate(names):
     charts_noise.append(chart2)
 
 # 绘制曲线
-st.altair_chart(alt.layer(*charts_sens))
-st.altair_chart(alt.layer(*charts_noise))
+with tab1:
+    st.altair_chart(alt.layer(*charts_sens))
+with tab2:
+    st.altair_chart(alt.layer(*charts_noise))
 st.toast("计算完成!")
