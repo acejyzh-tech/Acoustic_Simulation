@@ -105,5 +105,5 @@ with curvebox.container():
     with tab2:
         st.altair_chart(alt.layer(*charts_noise))
     with tab3:
-        st.altair_chart(alt.layer(*charts_noise))
+        st.altair_chart(alt.layer(*charts_phase))
     log_debug(f"计算中完成"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
