@@ -58,16 +58,19 @@ with curvebox.container():
         mic.VH.R = paras[i][5]*1e9
         mic.BH.R = paras[i][6]*1e6
         mic.BH.M = paras[i][7]*1e3
-        sens, noise = [], []  # 初始化数组
+        sens, noise, phase = [], [], []  # 初始化数组
         for f in freqs:
             mic.AH.R = ac.Ra(f=f, D=paras[i][0]*1e-3, L=paras[i][1]*1e-3)
             mic.AH.M = ac.Ma(f=f, D=paras[i][0]*1e-3, L=paras[i][1]*1e-3)
             sens.append(ac.dB(mic.Sens(f)))
             noise.append(ac.dB(mic.N_total(f)))
+            phase.append(mic.phase(f))
         Sensitivity[names[i]] = sens
         Noise[names[i]] = noise
+        Phase[names[i]] = phase
     log_debug(Sensitivity)
     log_debug(Noise)
+    log_debug(Phase)
 
     # 绘制频响曲线
     charts_sens, charts_noise = [], []
@@ -83,8 +86,15 @@ with curvebox.container():
             y=alt.Y(f"{col}:Q", title="噪声谱（dB）"),
             color=alt.value(colors[i])
         )
+        chart3 = alt.Chart(Phase).mark_line().encode(
+            x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
+            y=alt.Y(f"{col}:Q", title="相位（rad）"),
+            color=alt.value(colors[i])
+        )
         charts_sens.append(chart1)
         charts_noise.append(chart2)
+        charts_noise.append(chart3)
+
     
     # 绘制曲线
     tab1, tab2, tab3 = st.tabs(["灵敏度频响曲线", "噪声频谱曲线", "相位频响曲线"])
