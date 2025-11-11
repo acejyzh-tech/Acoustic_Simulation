@@ -5,6 +5,23 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
+log_key = "debug_log"
+log_area = st.empty()
+
+def log_debug(msg):
+    st.session_state.debug_logs += f"{msg}\n"
+    log_area.text_area("程序信息", value=st.session_state.debug_logs, height=300, key=log_key)
+
+def copy_logs():
+    st.components.v1.html("""
+        <script>
+            navigator.clipboard.writeText(document.querySelector("#" + "debug_log").value);
+        </script>
+    """, height=0)
+
+def clear_logs():
+    st.session_state.debug_logs = ""
+
 input_para = st.text_area(
     ":material/Settings: 请输入麦克风的参数：", 
     "0.3,0.2,0.15,1.3,1.85,180,280,6.0")
@@ -72,23 +89,6 @@ with tab3:
 st.toast("计算完成!")
 
 if "debug_logs" not in st.session_state: # 初始化调试日志
-    st.session_state.debug_logs = ""
-
-log_key = "debug_log"
-log_area = st.empty()
-
-def log_debug(msg):
-    st.session_state.debug_logs += f"{msg}\n"
-    log_area.text_area("程序信息", value=st.session_state.debug_logs, height=300, key=log_key)
-
-def copy_logs():
-    st.components.v1.html("""
-        <script>
-            navigator.clipboard.writeText(document.querySelector("#" + "debug_log").value);
-        </script>
-    """, height=0)
-
-def clear_logs():
     st.session_state.debug_logs = ""
 
 col1, col2 = st.columns(2)
