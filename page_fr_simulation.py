@@ -26,6 +26,7 @@ Noise = pd.DataFrame({'Freq': freqs, })
 MICS = []    # 建立麦克风组
 for mic_para in paras:
     MICS.append(ac.MIC())
+    log_debug(mic_para)
 # 计算麦克风频响
 for i, mic in enumerate(MICS):
     mic.FC.C = ac.Ca(paras[i][2])*1e-9
