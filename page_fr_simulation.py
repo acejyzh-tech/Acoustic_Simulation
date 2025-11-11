@@ -72,4 +72,5 @@ with tab3:
     st.altair_chart(alt.layer(*charts_noise))
 st.toast("计算完成!")
 
-st.session_state.debug_logs = debug_logs
+if 'key' not in st.session_state:
+    st.session_state.key = 'debug_logs'
