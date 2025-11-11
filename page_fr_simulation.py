@@ -17,6 +17,9 @@ def log_debug(msg):
     else:
         st.session_state[log_key] += f"{msg}\n"
         log_area.text_area("程序信息", value=st.session_state[log_key], height=300)
+        
+log_debug(f"初始化完成..."+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
 # 参数输入区
 with parabox.container():
     input_para = st.text_area(
