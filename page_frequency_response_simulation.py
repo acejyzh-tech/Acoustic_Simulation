@@ -19,7 +19,7 @@ def log_debug(msg):
         st.session_state[log_key] += f"{msg}\n"
         log_area.text_area("程序信息", value=st.session_state[log_key], height=100)
 st.session_state[log_key] = ""
-log_debug(f"更新数据..."+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+log_debug(f":green[更新数据...]"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
 # 参数输入区
 with parabox.container():
@@ -42,8 +42,8 @@ with parabox.container():
                      index = names)
     # st.caption("依次输入声孔直径$(mm)$，声孔长度$(mm)$，前腔体积$(mm^3)$，后腔体积$(mm^3)$，振膜声顺$(fF)$，泄气孔声阻尼$(G\Omega)$，薄流层声阻尼$(M\Omega)$，薄流层声质量$(KH)$，数据之间用英文逗号连接。无效数据不会被读取。")
     st.button("计算", type="primary")
-    st.markdown("麦克风的参数列表") 
-    st.dataframe(df) 
+    # st.markdown("麦克风的参数列表") 
+    # st.dataframe(df) 
     log_debug(df.to_string(header=False))
     log_debug(f"计算中...")
     st.divider()
