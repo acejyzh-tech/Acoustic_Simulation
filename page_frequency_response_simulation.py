@@ -51,7 +51,8 @@ with curvebox.container():
     Noise = pd.DataFrame({'Freq': freqs, })
     Phase = pd.DataFrame({'Freq': freqs, })
 
-    
+    selection = st.pills("麦克风编号", names, selection_mode="multi")
+    st.markdown(f"Your selected options: {selection}.")
     MICS = []    # 建立麦克风组
     for mic_para in paras:
         MICS.append(ac.MIC())
