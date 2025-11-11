@@ -33,6 +33,7 @@ with parabox.container():
                       ["声孔直径", "声孔长度", "前腔体积", "后腔体积", 
                        "振膜声顺", "泄气孔声阻尼", "薄流层声阻尼", "薄流层声质量"],
                      index = names)
+    st.button("计算", type="primary")
     st.dataframe(df) 
     log_debug(df)
     log_debug(f"计算中...")
