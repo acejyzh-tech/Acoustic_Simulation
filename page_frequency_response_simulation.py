@@ -82,13 +82,14 @@ with curvebox.container():
     charts_sens, charts_noise, charts_phase = [], [], []
     colors = ["#3b6291", "#943c39", "#779043", "#624c7c", "#388498", "#bf7334", "#3f689", "#9c403d", "#7d9847", "#675083", "#3b8ba1", "#c97937"]
     for i, col in enumerate(names):
+        if (col==selection):
+            color=alt.value(colors[1])
+        else:
+            color=alt.value(colors[0])
         chart1 = alt.Chart(Sensitivity).mark_line().encode(
             x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
             y=alt.Y(f"{col}:Q", title="灵敏度（dB）"),
-            if (col==selection):
-                color=alt.value(colors[1])
-            else:
-                color=alt.value(colors[0])
+            color = color
         )
         chart2 = alt.Chart(Noise).mark_line().encode(
             x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
