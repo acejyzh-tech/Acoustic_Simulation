@@ -30,7 +30,7 @@ with parabox.container():
     +"0.3,0.2,0.15,1.3,1.85,180,280,6.0\n"
     +"0.35,0.2,0.15,1.3,1.85,180,280,6.0\n",
     label_visibility = "visible",
-    help = ""依次输入声孔直径$(mm)$，声孔长度$(mm)$，前腔体积$(mm^3)$，后腔体积$(mm^3)$，振膜声顺$(fF)$，泄气孔声阻尼$(G\Omega)$，薄流层声阻尼$(M\Omega)$，薄流层声质量$(KH)$，数据之间用英文逗号连接。无效数据不会被读取。"")
+    help = "依次输入声孔直径$(mm)$，声孔长度$(mm)$，前腔体积$(mm^3)$，后腔体积$(mm^3)$，振膜声顺$(fF)$，泄气孔声阻尼$(G\Omega)$，薄流层声阻尼$(M\Omega)$，薄流层声质量$(KH)$，数据之间用英文逗号连接。无效数据不会被读取。")
     rows = input_para.split('\n')
     paras = [row.split(',') for row in rows]
     paras = [[float(item) if isinstance(item, str) and item.replace('.', '', 1).isdigit() else None for item in row] for row in paras]
