@@ -5,6 +5,10 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
+
+if "debug_logs" not in st.session_state: # 初始化调试日志
+    st.session_state.debug_logs = ""
+
 log_key = "debug_log"
 log_area = st.empty()
 
@@ -21,6 +25,15 @@ def copy_logs():
 
 def clear_logs():
     st.session_state.debug_logs = ""
+
+col1, col2 = st.columns(2)
+with col1:
+    st.button("复制", on_click=copy_logs)
+with col2:
+    st.button("清空", on_click=clear_logs)
+
+
+
 
 input_para = st.text_area(
     ":material/Settings: 请输入麦克风的参数：", 
@@ -88,14 +101,6 @@ with tab3:
     st.altair_chart(alt.layer(*charts_noise))
 st.toast("计算完成!")
 
-if "debug_logs" not in st.session_state: # 初始化调试日志
-    st.session_state.debug_logs = ""
-
-col1, col2 = st.columns(2)
-with col1:
-    st.button("复制", on_click=copy_logs)
-with col2:
-    st.button("清空", on_click=clear_logs)
 
 # 模拟调试输出
 log_debug(f"初始化完成..."+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
