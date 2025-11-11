@@ -61,7 +61,9 @@ with curvebox.container():
             noise.append(ac.dB(mic.N_total(f)))
         Sensitivity[names[i]] = sens
         Noise[names[i]] = noise
-    
+    log_debug(Sensitivity)
+    log_debug(Noise)
+
     # 绘制频响曲线
     charts_sens, charts_noise = [], []
     colors = ["#3b6291", "#943c39", "#779043", "#624c7c", "#388498", "#bf7334", "#3f689", "#9c403d", "#7d9847", "#675083", "#3b8ba1", "#c97937"]
