@@ -5,7 +5,7 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
-st.caption("麦克风集中参数仿真。输入声孔尺寸（直径、深度）、前后腔容积、振膜顺性、泄气通道声阻尼、薄流层声阻和声质量，求解Kirchhoff方程组计算麦克风的灵敏度频响、噪声谱、以及相位频响。")
+st.caption("基于Kirchhoff Law和微孔管理论的麦克风集中参数仿真工具。输入声孔尺寸（直径、深度）、前后腔容积、振膜顺性、泄气通道声阻尼、薄流层声阻和声质量，求解Kirchhoff方程组计算麦克风的灵敏度频响、噪声谱、以及相位频响。")
 
 parabox = st.empty()
 curvebox = st.empty()
