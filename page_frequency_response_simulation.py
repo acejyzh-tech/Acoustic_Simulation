@@ -85,7 +85,7 @@ with curvebox.container():
         chart1 = alt.Chart(Sensitivity).mark_line().encode(
             x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
             y=alt.Y(f"{col}:Q", title="灵敏度（dB）"),
-            if col==selection:
+            if (col==selection):
                 color=alt.value(colors[1])
             else:
                 color=alt.value(colors[0])
