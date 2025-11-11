@@ -60,8 +60,11 @@ for i, col in enumerate(names):
     charts_noise.append(chart2)
 
 # 绘制曲线
+tab1, tab2, tab3 = st.tabs(["灵敏度频响曲线", "噪声频谱曲线", "相位频响曲线"])
 with tab1:
     st.altair_chart(alt.layer(*charts_sens))
 with tab2:
+    st.altair_chart(alt.layer(*charts_noise))
+with tab3:
     st.altair_chart(alt.layer(*charts_noise))
 st.toast("计算完成!")
