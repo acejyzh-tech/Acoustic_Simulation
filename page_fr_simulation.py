@@ -11,7 +11,6 @@ log_key = "debug_log"
 log_area = st.empty()
 
 def log_debug(msg):
-
     if log_key not in st.session_state:
         st.session_state[log_key] = ""
     else:
