@@ -24,10 +24,6 @@ st.dataframe(df)
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 Sensitivity = pd.DataFrame({'Freq': freqs, })
 Noise = pd.DataFrame({'Freq': freqs, })
-log_debug(df)
-log_debug(Sensitivity)
-log_debug(Noise)
-
 
 MICS = []    # 建立麦克风组
 for mic_para in paras:
@@ -76,3 +72,4 @@ with tab3:
     st.altair_chart(alt.layer(*charts_noise))
 st.toast("计算完成!")
 
+st.session_state.debug_logs = debug_logs
