@@ -51,7 +51,7 @@ with curvebox.container():
     Noise = pd.DataFrame({'Freq': freqs, })
     Phase = pd.DataFrame({'Freq': freqs, })
 
-    selection = st.pills("麦克风编号", names, selection_mode="multi")
+    selection = st.pills("麦克风编号", names, selection_mode="single")
     st.markdown(f"Your selected options: {selection}.")
     MICS = []    # 建立麦克风组
     for mic_para in paras:
@@ -85,7 +85,10 @@ with curvebox.container():
         chart1 = alt.Chart(Sensitivity).mark_line().encode(
             x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
             y=alt.Y(f"{col}:Q", title="灵敏度（dB）"),
-            color=alt.value(colors[i])
+            if col==selection:
+                color=alt.value(colors[1])
+            else:
+                color=alt.value(colors[0])
         )
         chart2 = alt.Chart(Noise).mark_line().encode(
             x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
