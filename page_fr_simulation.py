@@ -16,7 +16,7 @@ def log_debug(msg):
     else:
         st.session_state[log_key] += f"{msg}\n"
         log_area.text_area("程序信息", value=st.session_state[log_key], height=300)
-        
+st.session_state[log_key] = ""
 log_debug(f"更新数据..."+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
 # 参数输入区
