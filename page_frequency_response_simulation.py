@@ -95,7 +95,7 @@ with curvebox.container():
         )
         charts_sens.append(chart1)
         charts_noise.append(chart2)
-        charts_noise.append(chart3)
+        charts_phase.append(chart3)
 
     
     # 绘制曲线
