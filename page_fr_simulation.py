@@ -52,11 +52,14 @@ st.dataframe(df)
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 Sensitivity = pd.DataFrame({'Freq': freqs, })
 Noise = pd.DataFrame({'Freq': freqs, })
+log_debug(df)
+log_debug(Sensitivity)
+log_debug(Noise)
+
 
 MICS = []    # 建立麦克风组
 for mic_para in paras:
     MICS.append(ac.MIC())
-    log_debug(mic_para)
 # 计算麦克风频响
 for i, mic in enumerate(MICS):
     mic.FC.C = ac.Ca(paras[i][2])*1e-9
