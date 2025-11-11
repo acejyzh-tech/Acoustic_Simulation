@@ -81,7 +81,7 @@ with curvebox.container():
     colors = ["#3b6291", "#943c39", "#779043", "#624c7c", "#388498", "#bf7334", "#3f689", "#9c403d", "#7d9847", "#675083", "#3b8ba1", "#c97937"]
     # colors = ["red", "orange", "yellow", "green"]
     for i, col in enumerate(names):
-        st.badge(col, icon=":material/check:", color=colors[i])
+        st.badge("11", icon=":material/check:", color=colors[i])
         chart1 = alt.Chart(Sensitivity).mark_line().encode(
             x=alt.X("Freq:Q", scale=alt.Scale(type='log'), title='频率（Hz）'),
             y=alt.Y(f"{col}:Q", title="灵敏度（dB）"),
