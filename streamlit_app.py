@@ -23,7 +23,7 @@ dir_path = Path(__file__).parent
 def run() -> None:
     page = st.navigation(
         {
-            "JYZhang 的声学工具箱": [
+            "JY.Zhang 的声学工具箱": [
 
                 st.Page(
                     dir_path / "page_weighting.py",
@@ -31,7 +31,7 @@ def run() -> None:
                     icon=":material/show_chart:",
                 ),
                 st.Page(
-                    dir_path / "page_fr_simulation.py",
+                    dir_path / "page_frequency_response_simulation.py",
                     title="麦克风集中参数法仿真",
                     icon=":material/show_chart:",
                 ),
