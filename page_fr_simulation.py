@@ -35,6 +35,7 @@ with parabox.container():
                      index = names)
     st.dataframe(df) 
     log_debug(df)
+    log_debug(f"计算中...")
 
 with curvebox.container():
     freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
@@ -86,4 +87,4 @@ with curvebox.container():
         st.altair_chart(alt.layer(*charts_noise))
     with tab3:
         st.altair_chart(alt.layer(*charts_noise))
-
+    log_debug(f"计算中完成"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
