@@ -6,7 +6,7 @@ import altair as alt
 import JYAcoustic as ac
 
 st.caption("基于Kirchhoff Law和微孔管理论的麦克风集中参数仿真工具。输入声孔尺寸（直径、深度）、前后腔容积、振膜顺性、泄气通道声阻尼、薄流层声阻和声质量，求解Kirchhoff方程组计算麦克风的灵敏度频响、噪声谱、以及相位频响。")
-
+st.divider()
 parabox = st.empty()
 curvebox = st.empty()
 log_key = "debug_log"
@@ -44,6 +44,7 @@ with parabox.container():
     st.dataframe(df) 
     log_debug(df.to_string(header=False))
     log_debug(f"计算中...")
+    st.divider()
 
 with curvebox.container():
     freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
