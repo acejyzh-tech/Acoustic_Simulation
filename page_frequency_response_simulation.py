@@ -33,7 +33,7 @@ with parabox.container():
     paras = [row for row in paras if all(cell is not None for cell in row) and len(row)==8]
     names = [str(i+1)+"#" for i in range(len(paras))]
     df = pd.DataFrame(paras, columns=
-                      ["声孔\n直径", "声孔长度", "前腔体积", "后腔体积", 
+                      ["声孔直径", "声孔长度", "前腔体积", "后腔体积", 
                        "振膜声顺", "泄气孔声阻尼", "薄流层声阻尼", "薄流层声质量"],
                      index = names)
     st.caption("依次输入声孔直径$(mm)$，声孔长度$(mm)$，前腔体积$(mm^3)$，后腔体积$(mm^3)$，振膜声顺$(fF)$，泄气孔声阻尼$(G\Omega)$，薄流层声阻尼$(M\Omega)$，薄流层声质量$(KH)$，数据之间用英文逗号连接。无效数据不会被读取。")
