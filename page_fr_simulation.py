@@ -5,21 +5,33 @@ import streamlit as st
 import altair as alt
 import JYAcoustic as ac
 
-debug_logs = f"初始化完成..."+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"\n"
+parabox = st.empty()
+curvebox = st.empty()
+log_key = "debug_log"
+log_area = st.empty()
 
-input_para = st.text_area(
-    ":material/Settings: 请输入麦克风的参数：", 
-    "0.3,0.2,0.15,1.3,1.85,180,280,6.0")
-rows = input_para.split('\n')
-paras = [row.split(',') for row in rows]
-paras = [[float(item) if isinstance(item, str) and item.replace('.', '', 1).isdigit() else None for item in row] for row in paras]
-paras = [row for row in paras if all(cell is not None for cell in row) and len(row)==8]
-names = [str(i+1)+"#" for i in range(len(paras))]
-df = pd.DataFrame(paras, columns=
-                  ["声孔直径", "声孔长度", "前腔体积", "后腔体积", 
-                   "振膜声顺", "泄气孔声阻尼", "薄流层声阻尼", "薄流层声质量"],
-                 index = names)
-st.dataframe(df) 
+def log_debug(msg):
+
+    if log_key not in st.session_state:
+        st.session_state[log_key] = ""
+    else:
+        st.session_state[log_key] += f"{msg}\n"
+        log_area.text_area("程序信息", value=st.session_state[log_key], height=300)
+# 参数输入区
+with parabox.container():
+    input_para = st.text_area(
+        ":material/Settings: 请输入麦克风的参数：", 
+        "0.3,0.2,0.15,1.3,1.85,180,280,6.0")
+    rows = input_para.split('\n')
+    paras = [row.split(',') for row in rows]
+    paras = [[float(item) if isinstance(item, str) and item.replace('.', '', 1).isdigit() else None for item in row] for row in paras]
+    paras = [row for row in paras if all(cell is not None for cell in row) and len(row)==8]
+    names = [str(i+1)+"#" for i in range(len(paras))]
+    df = pd.DataFrame(paras, columns=
+                      ["声孔直径", "声孔长度", "前腔体积", "后腔体积", 
+                       "振膜声顺", "泄气孔声阻尼", "薄流层声阻尼", "薄流层声质量"],
+                     index = names)
+    st.dataframe(df) 
 
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 Sensitivity = pd.DataFrame({'Freq': freqs, })
