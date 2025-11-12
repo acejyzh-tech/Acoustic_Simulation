@@ -16,5 +16,4 @@ data = {
   "说明":["定义国际单位制 SI 的七个固定常数之一"]
 }
 df = pd.DataFrame(data)
-
-st.table(df)
+st.dataframe(df, column_config={"单位": st.column_config.MarkdownColumn("单位")})
