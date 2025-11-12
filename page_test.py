@@ -9,12 +9,12 @@ def generate_white_noise(duration=5, sample_rate=44100, mean=0, std=1):
     num_samples = int(sample_rate * duration)
     noise = np.random.normal(mean, std, num_samples)
     noise = noise / np.max(np.abs(noise))
-    return noise
+    return noise *0.5
 
 # 替代粉红噪声生成方法（使用滤波白噪声）
 def generate_pink_noise(duration=5, sample_rate=44100):
     # 生成白噪声
-    white_noise = np.random.randn(int(duration * sample_rate))
+    white_noise = generate_white_noise(duration, sample_rate)
     # 使用滤波器近似粉红噪声（1/f特性）
     b, a = scipy.signal.butter(2, 0.1, btype='low')  # 低通滤波器
     pink_noise = scipy.signal.lfilter(b, a, white_noise)
