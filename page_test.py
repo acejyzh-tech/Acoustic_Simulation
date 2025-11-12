@@ -76,7 +76,7 @@ def audio_to_bytes(audio_data, sample_rate):
 
 st.caption("常用的声音库，点击按钮播放。注意：由于您的播放设备的频响特性差异，实际听到的音频会被“染色”。")
 # 按钮交互
-st.divide()
+st.divider()
 with st.container(horizontal=True):
     if st.button("白噪声", icon=":material/earthquake:"):
         audio_data = generate_white_noise()
@@ -93,7 +93,7 @@ with st.container(horizontal=True):
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-st.divide()
+st.divider()
 with st.container(horizontal=True):
     if st.button("单频音 (440Hz)", icon=":material/earthquake:"):
         audio_data = generate_tone(440)
@@ -135,7 +135,7 @@ with st.container(horizontal=True):
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
 
-st.divide()
+st.divider()
 with st.container(horizontal=True):
     if st.button("扫频音 (20Hz-20kHz)", icon=":material/earthquake:"):
         audio_data = generate_sweep()
