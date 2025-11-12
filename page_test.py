@@ -16,7 +16,7 @@ def generate_pink_noise(duration=5, sample_rate=44100):
     # 生成白噪声
     white_noise = generate_white_noise(duration, sample_rate)
     # 使用滤波器近似粉红噪声（1/f特性）
-    b, a = scipy.signal.butter(1, 100.0, btype='lowpass', fs=sample_rate)  # 低通滤波器
+    b, a = scipy.signal.butter(0.5, 10.0, btype='lowpass', fs=sample_rate)  # 低通滤波器
     pink_noise = scipy.signal.lfilter(b, a, white_noise)
     # 归一化
     return pink_noise / np.max(np.abs(pink_noise)) * 0.5
