@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 from scipy.io.wavfile import write
 import scipy.signal
+from scipy.fft import rfft, irfft
 import io
 
 # 生成白噪声
