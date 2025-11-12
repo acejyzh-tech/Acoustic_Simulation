@@ -38,7 +38,7 @@ def run() -> None:
                     icon=":material/show_chart:",),
                 st.Page(
                     dir_path / "page_test.py",
-                    title="由低衰和谐振峰点生成麦克风频响曲线",
+                    title="测试页，开发中...",
                     icon=":material/show_chart:",),
             ]
         }
