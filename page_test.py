@@ -4,8 +4,6 @@ from scipy.io.wavfile import write
 import scipy.signal
 import io
 
-st.title("音频生成与播放工具（兼容旧版scipy）")
-
 # 生成白噪声
 def generate_white_noise(duration=5, sample_rate=44100):
     return np.random.randn(int(duration * sample_rate))
@@ -37,22 +35,32 @@ def audio_to_bytes(audio_data, sample_rate):
     return byte_io.getvalue()
 
 # 按钮交互
-if st.button("播放白噪声"):
+if st.button("白噪声"):
     audio_data = generate_white_noise()
     audio_bytes = audio_to_bytes(audio_data, 44100)
     st.audio(audio_bytes, format='audio/wav', autoplay=True)
 
-if st.button("播放粉红噪声（旧版兼容）"):
+if st.button("粉红噪声"):
     audio_data = generate_pink_noise()
     audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav')
+    st.audio(audio_bytes, format='audio/wav', autoplay=True)
 
-if st.button("播放单频音 (440Hz)"):
+if st.button("单频音 (100Hz)"):
+    audio_data = generate_tone(100)
+    audio_bytes = audio_to_bytes(audio_data, 44100)
+    st.audio(audio_bytes, format='audio/wav', autoplay=True)
+    
+if st.button("单频音 (1000Hz)"):
+    audio_data = generate_tone(1000)
+    audio_bytes = audio_to_bytes(audio_data, 44100)
+    st.audio(audio_bytes, format='audio/wav', autoplay=True)
+    
+if st.button("单频音 (440Hz)"):
     audio_data = generate_tone(440)
     audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav')
+    st.audio(audio_bytes, format='audio/wav', autoplay=True)
 
-if st.button("播放扫频音 (20Hz-20kHz)"):
+if st.button("扫频音 (20Hz-20kHz)"):
     audio_data = generate_sweep()
     audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav')
+    st.audio(audio_bytes, format='audio/wav', autoplay=True)
