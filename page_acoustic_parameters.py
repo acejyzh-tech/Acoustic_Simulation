@@ -7,7 +7,13 @@ with st.container(horizontal=True):
   pressure = st.number_input("Pressure (Pa)", value=101325)
 data = {
   "名称":[],
-  "符号":[]
+  "英文":[],
+  "符号":[],
+  "数值":[],
+  "单位":[],
+  "量纲":[],
+  "公式":[],
+  "说明":[]
 }
 df = pd.DataFrame(data)
 
