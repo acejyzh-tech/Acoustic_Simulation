@@ -87,11 +87,6 @@ with st.container(horizontal=True):
         audio_data = generate_pink_noise()
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
-    
-    if st.button("布朗噪声", icon=":material/earthquake:"):
-        audio_data = generate_red_noise()
-        audio_bytes = audio_to_bytes(audio_data, 44100)
-        st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
 st.divider()
 with st.container(horizontal=True):
