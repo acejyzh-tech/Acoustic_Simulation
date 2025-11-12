@@ -24,22 +24,22 @@ def run() -> None:
     page = st.navigation(
         {
             "JY.Zhang 的声学工具箱": [
-
+                st.Page(
+                    dir_path / "page_sound_library.py",
+                    title="常用声音素材库",
+                    icon=":material/show_chart:",),
                 st.Page(
                     dir_path / "page_weighting.py",
                     title="计算A计权值",
-                    icon=":material/show_chart:",
-                ),
+                    icon=":material/show_chart:",),
                 st.Page(
                     dir_path / "page_frequency_response_simulation.py",
                     title="麦克风集中参数法仿真",
-                    icon=":material/show_chart:",
-                ),
+                    icon=":material/show_chart:",),
                 st.Page(
                     dir_path / "page_test.py",
                     title="由低衰和谐振峰点生成麦克风频响曲线",
-                    icon=":material/show_chart:",
-                ),
+                    icon=":material/show_chart:",),
             ]
         }
     )
