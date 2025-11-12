@@ -33,7 +33,7 @@ def audio_to_bytes(audio_data, sample_rate):
     byte_io = io.BytesIO()
     write(byte_io, sample_rate, audio_data)
     return byte_io.getvalue()
-st.caption("常用的声音库。")
+st.caption("常用的声音库，点击按钮播放。注意：由于您的播放设备的频响特性差异，实际听到的音频会被“染色”。")
 # 按钮交互
 with st.container(horizontal=True):
     if st.button("白噪声"):
