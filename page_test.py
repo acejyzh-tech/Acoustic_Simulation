@@ -33,7 +33,7 @@ def audio_to_bytes(audio_data, sample_rate):
     byte_io = io.BytesIO()
     write(byte_io, sample_rate, audio_data)
     return byte_io.getvalue()
-
+st.caption("常用的声音库。")
 # 按钮交互
 with st.container(horizontal=True):
     if st.button("白噪声"):
