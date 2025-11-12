@@ -56,9 +56,3 @@ if st.button("播放扫频音 (20Hz-20kHz)"):
     audio_data = generate_sweep()
     audio_bytes = audio_to_bytes(audio_data, 44100)
     st.audio(audio_bytes, format='audio/wav')
-
-st.markdown("""
-### 使用说明：
-1. 安装依赖：
-```bash
-pip install streamlit numpy scipy
