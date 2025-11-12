@@ -118,4 +118,7 @@ with curvebox.container():
         
     log_debug(f"计算中完成"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     st.divider()
-
+st.caption("""
+参考文献：
+1、EEE
+""")
