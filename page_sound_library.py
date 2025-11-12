@@ -4,6 +4,7 @@ from scipy.io.wavfile import write
 import scipy.signal
 from scipy.fft import rfft, irfft
 import io
+st.header("常用声音素材库", divider=True)
 
 # 生成白噪声
 def generate_white_noise(duration=5, sample_rate=44100, mean=0, std=1):
