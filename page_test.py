@@ -5,8 +5,12 @@ import scipy.signal
 import io
 
 # 生成白噪声
-def generate_white_noise(duration=5, sample_rate=44100):
-    return np.random.randn(int(duration * sample_rate))
+def generate_white_noise(duration=5, sample_rate=44100, mean=0, std=1):
+    num_samples = int(sample_rate * duration)
+    noise = np.random.normal(mean, std, num_samples)
+    noise = noise / np.max(np.abs(noise))
+    noise = np.int16(noise * 32767)
+    return noise
 
 # 替代粉红噪声生成方法（使用滤波白噪声）
 def generate_pink_noise(duration=5, sample_rate=44100):
