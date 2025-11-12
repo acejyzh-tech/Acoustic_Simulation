@@ -41,7 +41,7 @@ def generate_tone(frequency=440, duration=5, sample_rate=44100):
     t = np.linspace(0, duration, int(duration * sample_rate), endpoint=False)
     return 0.5 * np.sin(2 * np.pi * frequency * t)
 
-def generate_sweep(start_freq=20, end_freq=20000, duration=5, sample_rate=44100):
+def generate_sweep(start_freq=20, end_freq=20000, duration=10, sample_rate=44100):
     t = np.linspace(0, duration, int(duration * sample_rate), endpoint=False)
     return 0.5 * np.sin(2 * np.pi * (start_freq + (end_freq - start_freq)/duration * t) * t)
 
@@ -110,7 +110,7 @@ with st.container(horizontal=True):
 
 st.divider()
 with st.container(horizontal=True):
-    if st.button("扫频音 (20Hz-20kHz)", icon=":material/earthquake:"):
+    if st.button("20 Hz to 20 kHz 线性扫频", icon=":material/earthquake:"):
         audio_data = generate_sweep()
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
