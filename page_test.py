@@ -11,8 +11,29 @@ def generate_white_noise(duration=5, sample_rate=44100, mean=0, std=1):
     noise = noise / np.max(np.abs(noise))
     return noise *0.5
 
+def generate_pink_noise(duration=5, sample_rate=44100,length, sr):
+    """
+    生成粉红噪声
+    :param length: 采样点数
+    :param sr: 采样率
+    :return: 粉红噪声数组
+    """
+    # 生成白噪声
+    length = duration * sample_rate
+    white_noise = np.random.normal(0, 1, length)
+    # 设计1/f滤波器
+    n_bins = length // 2 + 1
+    freqs = np.linspace(0, sample_rate/2, n_bins)
+    filter_ = 1 / (freqs + 1e-6)  # 避免除以0
+    # 转换为线性相位滤波器
+    filter_ = np.concatenate([filter_, np.flip(filter_[1:-1])])
+    # 应用滤波器
+    pink_noise = np.fft.irfft(np.fft.rfft(white_noise) * filter_)
+    # 归一化
+    return pink_noise / np.max(np.abs(pink_noise))
+
 # 替代粉红噪声生成方法（使用滤波白噪声）
-def generate_pink_noise(duration=5, sample_rate=44100):
+def generate_pink_noise1(duration=5, sample_rate=44100):
     # 生成白噪声
     white_noise = generate_white_noise(duration, sample_rate)
     # 使用滤波器近似粉红噪声（1/f特性）
