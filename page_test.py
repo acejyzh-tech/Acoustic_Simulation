@@ -35,32 +35,35 @@ def audio_to_bytes(audio_data, sample_rate):
     return byte_io.getvalue()
 
 # 按钮交互
-if st.button("白噪声"):
-    audio_data = generate_white_noise()
-    audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav', autoplay=True)
-
-if st.button("粉红噪声"):
-    audio_data = generate_pink_noise()
-    audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav', autoplay=True)
-
-if st.button("单频音 (100Hz)"):
-    audio_data = generate_tone(100)
-    audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav', autoplay=True)
+with st.container():
+    if st.button("白噪声"):
+        audio_data = generate_white_noise()
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
     
-if st.button("单频音 (1000Hz)"):
-    audio_data = generate_tone(1000)
-    audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav', autoplay=True)
+    if st.button("粉红噪声"):
+        audio_data = generate_pink_noise()
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
     
-if st.button("单频音 (440Hz)"):
-    audio_data = generate_tone(440)
-    audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav', autoplay=True)
-
-if st.button("扫频音 (20Hz-20kHz)"):
-    audio_data = generate_sweep()
-    audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav', autoplay=True)
+with st.container():
+    if st.button("单频音 (100Hz)"):
+        audio_data = generate_tone(100)
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
+        
+    if st.button("单频音 (1000Hz)"):
+        audio_data = generate_tone(1000)
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
+        
+    if st.button("单频音 (440Hz)"):
+        audio_data = generate_tone(440)
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
+        
+with st.container():
+    if st.button("扫频音 (20Hz-20kHz)"):
+        audio_data = generate_sweep()
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
