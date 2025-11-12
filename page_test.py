@@ -40,7 +40,7 @@ def audio_to_bytes(audio_data, sample_rate):
 if st.button("播放白噪声"):
     audio_data = generate_white_noise()
     audio_bytes = audio_to_bytes(audio_data, 44100)
-    st.audio(audio_bytes, format='audio/wav')
+    st.audio(audio_bytes, format='audio/wav', autoplay=True)
 
 if st.button("播放粉红噪声（旧版兼容）"):
     audio_data = generate_pink_noise()
