@@ -102,16 +102,17 @@ with curvebox.container():
         charts_sens.append(chart1)
         charts_noise.append(chart2)
         charts_phase.append(chart3)
-
     
     # 绘制曲线
-    tab1, tab2, tab3 = st.tabs(["灵敏度频响曲线", "噪声频谱曲线", "相位频响曲线"])
+    tab1, tab2, tab3, tab4 = st.tabs(["灵敏度频响曲线", "噪声频谱曲线", "相位频响曲线", "数据汇总"])
     with tab1:
         st.altair_chart(alt.layer(*charts_sens))
     with tab2:
         st.altair_chart(alt.layer(*charts_noise))
     with tab3:
         st.altair_chart(alt.layer(*charts_phase))
+    with tab4:
+        st.dataframe(Sensitivity)
     log_debug(f"计算中完成"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     st.divider()
 
