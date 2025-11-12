@@ -76,7 +76,7 @@ def audio_to_bytes(audio_data, sample_rate):
 
 st.caption("常用的声音库，点击按钮播放。注意：由于您的播放设备的频响特性差异，实际听到的音频会被“染色”。")
 # 按钮交互
-st.divide()
+st.divider()
 with st.container(horizontal=True):
     if st.button("白噪声", icon=":material/earthquake:"):
         audio_data = generate_white_noise()
@@ -93,54 +93,53 @@ with st.container(horizontal=True):
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-st.divide()
+st.divider()
 with st.container(horizontal=True):
-    if st.button("单频音 (440Hz)", icon=":material/earthquake:"):
+    if st.button("440 Hz", icon=":material/earthquake:"):
         audio_data = generate_tone(440)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-    if st.button("单频音 (100Hz)", icon=":material/earthquake:"):
+    if st.button("100 Hz", icon=":material/earthquake:"):
         audio_data = generate_tone(100)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-    if st.button("单频音 (250Hz)", icon=":material/earthquake:"):
+    if st.button("250 Hz", icon=":material/earthquake:"):
         audio_data = generate_tone(250)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-    if st.button("单频音 (500Hz)", icon=":material/earthquake:"):
+    if st.button("500 Hz", icon=":material/earthquake:"):
         audio_data = generate_tone(500)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-    if st.button("单频音 (1000Hz)", icon=":material/earthquake:"):
+    if st.button("1,000 Hz", icon=":material/earthquake:"):
         audio_data = generate_tone(1000)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-    if st.button("单频音 (2000Hz)", icon=":material/earthquake:"):
+    if st.button("2,000 Hz", icon=":material/earthquake:"):
         audio_data = generate_tone(2000)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-    if st.button("单频音 (5000Hz)", icon=":material/earthquake:"):
+    if st.button("5,000 Hz", icon=":material/earthquake:"):
         audio_data = generate_tone(5000)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-    if st.button("单频音 (10000Hz)", icon=":material/earthquake:"):
+    if st.button("10,000 Hz", icon=":material/earthquake:"):
         audio_data = generate_tone(10000)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
 
-st.divide()
+st.divider()
 with st.container(horizontal=True):
     if st.button("扫频音 (20Hz-20kHz)", icon=":material/earthquake:"):
         audio_data = generate_sweep()
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
-
 
 
