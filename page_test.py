@@ -22,7 +22,7 @@ def generate_pink_noise(duration=5, sample_rate=44100):
     pink_fft = X * S
     pink_noise = irfft(pink_fft)
     pink_noise = pink_noise / np.max(np.abs(pink_noise))
-    return pink_noise
+    return pink_noise *0.5
 
 # 替代粉红噪声生成方法（使用滤波白噪声）
 def generate_pink_noise1(duration=5, sample_rate=44100):
