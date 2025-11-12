@@ -27,12 +27,23 @@ def generate_sweep(start_freq=20, end_freq=20000, duration=5, sample_rate=44100)
     t = np.linspace(0, duration, int(duration * sample_rate), endpoint=False)
     return 0.5 * np.sin(2 * np.pi * (start_freq + (end_freq - start_freq)/duration * t) * t)
 
-# 音频转字节流函数不变
+def generate_babble_noise(sample_rate=44100, duration=5, num_sinusoids=20):
+    t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+    frequencies = np.random.uniform(100, 3000, num_sinusoids)
+    amplitudes = np.random.uniform(0.1, 0.5, num_sinusoids)
+    babble = np.zeros_like(t)
+    for f, a in zip(frequencies, amplitudes):
+        babble += a * np.sin(2 * np.pi * f * t)
+    babble = np.int16(babble / np.max(np.abs(babble)) * 32767)
+    return babble
+
+# 音频转字节流函数
 def audio_to_bytes(audio_data, sample_rate):
     audio_data = np.int16(audio_data * 32767)
     byte_io = io.BytesIO()
     write(byte_io, sample_rate, audio_data)
     return byte_io.getvalue()
+
 st.caption("常用的声音库，点击按钮播放。注意：由于您的播放设备的频响特性差异，实际听到的音频会被“染色”。")
 # 按钮交互
 with st.container(horizontal=True):
@@ -43,6 +54,11 @@ with st.container(horizontal=True):
     
     if st.button("粉红噪声", icon=":material/earthquake:"):
         audio_data = generate_pink_noise()
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
+    
+    if st.button("Babble 噪声", icon=":material/earthquake:"):
+        audio_data = generate_babble_noise()
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
     
@@ -92,3 +108,6 @@ with st.container(horizontal=True):
         audio_data = generate_sweep()
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
+
+
+
