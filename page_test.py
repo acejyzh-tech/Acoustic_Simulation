@@ -8,7 +8,7 @@ import io
 def generate_white_noise(duration=5, sample_rate=44100, mean=0, std=1):
     num_samples = int(sample_rate * duration)
     noise = np.random.normal(mean, std, num_samples)
-    noise = noise / np.max(np.abs(noise))
+    noise = noise / np.max(np.abs(noise)) / 2
     noise = np.int16(noise * 32767)
     return noise
 
