@@ -11,7 +11,7 @@ def generate_white_noise(duration=5, sample_rate=44100, mean=0, std=1):
     noise = noise / np.max(np.abs(noise))
     return noise *0.5
 
-def generate_pink_noise(duration=5, sample_rate=44100,length, sr):
+def generate_pink_noise(duration=5, sample_rate=44100):
     """
     生成粉红噪声
     :param length: 采样点数
