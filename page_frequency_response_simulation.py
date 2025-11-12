@@ -112,7 +112,7 @@ with curvebox.container():
     with tab3:
         st.altair_chart(alt.layer(*charts_phase))
     with tab4:
-        st.dataframe(pd.merge([Sensitivity, Noise, Phase], on="Freq"))
+        st.dataframe(pd.merge([Sensitivity, Noise, Phase], on="Freq", axis=1))
     log_debug(f"计算中完成"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     st.divider()
 
