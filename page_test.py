@@ -47,8 +47,23 @@ with st.container(horizontal=True):
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
     
 with st.container(horizontal=True):
+    if st.button("单频音 (440Hz)", icon=":material/earthquake:"):
+        audio_data = generate_tone(440)
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
+        
     if st.button("单频音 (100Hz)", icon=":material/earthquake:"):
         audio_data = generate_tone(100)
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
+        
+    if st.button("单频音 (250Hz)", icon=":material/earthquake:"):
+        audio_data = generate_tone(250)
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
+        
+    if st.button("单频音 (500Hz)", icon=":material/earthquake:"):
+        audio_data = generate_tone(500)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
@@ -57,8 +72,18 @@ with st.container(horizontal=True):
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
-    if st.button("单频音 (440Hz)", icon=":material/earthquake:"):
-        audio_data = generate_tone(440)
+    if st.button("单频音 (2000Hz)", icon=":material/earthquake:"):
+        audio_data = generate_tone(2000)
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
+        
+    if st.button("单频音 (5000Hz)", icon=":material/earthquake:"):
+        audio_data = generate_tone(5000)
+        audio_bytes = audio_to_bytes(audio_data, 44100)
+        st.audio(audio_bytes, format='audio/wav', autoplay=True)
+        
+    if st.button("单频音 (10000Hz)", icon=":material/earthquake:"):
+        audio_data = generate_tone(10000)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
         
