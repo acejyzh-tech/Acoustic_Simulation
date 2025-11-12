@@ -24,7 +24,7 @@ log_debug(f"更新数据..."+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()
 # 参数输入区
 with parabox.container():
     input_para = st.text_area(
-        ":material/Settings: 请输入麦克风的参数：", 
+        ":material/edit_note: 请输入麦克风的参数：", 
         "0.2,0.2,0.15,1.3,1.85,180,280,6.0\n"
     +"0.25,0.2,0.15,1.3,1.85,180,280,6.0\n"
     +"0.3,0.2,0.15,1.3,1.85,180,280,6.0\n"
