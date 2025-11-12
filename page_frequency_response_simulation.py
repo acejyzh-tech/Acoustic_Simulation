@@ -112,8 +112,8 @@ with curvebox.container():
     with tab3:
         st.altair_chart(alt.layer(*charts_phase))
     with tab4:
-        data_all = pd.merge(Sensitivity, Noise, on="Freq", suffixes=("_sens", "_noise"))
-        data_all = pd.merge(data_all, Phase, on="Freq", suffixes=("_sens", "_noise"))
+        data_1 = pd.merge(Sensitivity, Noise, on="Freq", suffixes=("_sens", "_noise"))
+        data_all = pd.merge(data_1, Phase, on="Freq", suffixes=("_sens", "_noise"))
         st.dataframe(data_all)
         
     log_debug(f"计算中完成"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
