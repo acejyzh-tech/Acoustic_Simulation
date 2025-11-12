@@ -36,19 +36,7 @@ def generate_red_noise(duration=5, sample_rate=44100):
     red_noise = red_noise / np.max(np.abs(red_noise))
     return red_noise *0.5
 
-
-
-# 替代粉红噪声生成方法（使用滤波白噪声）
-def generate_pink_noise1(duration=5, sample_rate=44100):
-    # 生成白噪声
-    white_noise = generate_white_noise(duration, sample_rate)
-    # 使用滤波器近似粉红噪声（1/f特性）
-    b, a = scipy.signal.butter(0.5, 10.0, btype='lowpass', fs=sample_rate)  # 低通滤波器
-    pink_noise = scipy.signal.lfilter(b, a, white_noise)
-    # 归一化
-    return pink_noise / np.max(np.abs(pink_noise)) * 0.5
-
-# 单频音和扫频音的函数保持不变
+# 单频音和扫频音
 def generate_tone(frequency=440, duration=5, sample_rate=44100):
     t = np.linspace(0, duration, int(duration * sample_rate), endpoint=False)
     return 0.5 * np.sin(2 * np.pi * frequency * t)
@@ -56,16 +44,6 @@ def generate_tone(frequency=440, duration=5, sample_rate=44100):
 def generate_sweep(start_freq=20, end_freq=20000, duration=5, sample_rate=44100):
     t = np.linspace(0, duration, int(duration * sample_rate), endpoint=False)
     return 0.5 * np.sin(2 * np.pi * (start_freq + (end_freq - start_freq)/duration * t) * t)
-
-def generate_babble_noise(sample_rate=44100, duration=5, num_sinusoids=20):
-    t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
-    frequencies = np.random.uniform(100, 3000, num_sinusoids)
-    amplitudes = np.random.uniform(0.1, 0.5, num_sinusoids)
-    babble = np.zeros_like(t)
-    for f, a in zip(frequencies, amplitudes):
-        babble += a * np.sin(2 * np.pi * f * t)
-    babble = np.int16(babble / np.max(np.abs(babble)) * 32767)
-    return babble
 
 # 音频转字节流函数
 def audio_to_bytes(audio_data, sample_rate):
