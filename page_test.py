@@ -24,6 +24,20 @@ def generate_pink_noise(duration=5, sample_rate=44100):
     pink_noise = pink_noise / np.max(np.abs(pink_noise))
     return pink_noise *0.5
 
+def generate_red_noise(duration=5, sample_rate=44100):
+    num_samples = int(sample_rate * duration)
+    white_noise = np.random.normal(0, 1, num_samples)
+    X = rfft(white_noise)
+    S = np.zeros_like(X)
+    freqs = np.fft.rfftfreq(num_samples, d=1/sample_rate)
+    S[1:] = 1 /freqs[1:]
+    red_fft = X * S
+    red_noise = irfft(red_fft)
+    red_noise = red_noise / np.max(np.abs(red_noise))
+    return red_noise *0.5
+
+
+
 # 替代粉红噪声生成方法（使用滤波白噪声）
 def generate_pink_noise1(duration=5, sample_rate=44100):
     # 生成白噪声
@@ -62,6 +76,7 @@ def audio_to_bytes(audio_data, sample_rate):
 
 st.caption("常用的声音库，点击按钮播放。注意：由于您的播放设备的频响特性差异，实际听到的音频会被“染色”。")
 # 按钮交互
+st.divide()
 with st.container(horizontal=True):
     if st.button("白噪声", icon=":material/earthquake:"):
         audio_data = generate_white_noise()
@@ -73,11 +88,12 @@ with st.container(horizontal=True):
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
     
-    if st.button("Babble 噪声", icon=":material/earthquake:"):
-        audio_data = generate_babble_noise()
+    if st.button("布朗噪声", icon=":material/earthquake:"):
+        audio_data = generate_red_noise()
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
-    
+        
+st.divide()
 with st.container(horizontal=True):
     if st.button("单频音 (440Hz)", icon=":material/earthquake:"):
         audio_data = generate_tone(440)
@@ -118,7 +134,8 @@ with st.container(horizontal=True):
         audio_data = generate_tone(10000)
         audio_bytes = audio_to_bytes(audio_data, 44100)
         st.audio(audio_bytes, format='audio/wav', autoplay=True)
-        
+
+st.divide()
 with st.container(horizontal=True):
     if st.button("扫频音 (20Hz-20kHz)", icon=":material/earthquake:"):
         audio_data = generate_sweep()
