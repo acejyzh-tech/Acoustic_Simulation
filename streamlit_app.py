@@ -25,10 +25,6 @@ def run() -> None:
         {
             "JY.Zhang 的声学工具箱": [
                 st.Page(
-                    dir_path / "page_acoustic_parameters.py",
-                    title="常用声学参数",
-                    icon=":material/show_chart:",),
-                st.Page(
                     dir_path / "page_sound_library.py",
                     title="常用声音素材库",
                     icon=":material/show_chart:",),
