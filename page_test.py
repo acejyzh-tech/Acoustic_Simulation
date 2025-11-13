@@ -14,7 +14,7 @@ freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 As = []
 for data in fr_paras:
   As.append(ac.dB(1/np.sqrt(1+(50/freqs)**2)))
-df = pd.DataFrame(
-  freq:freqs,
-)
+df = pd.DataFrame({
+  "freq": freqs,
+})
 st.dataframe(As)
