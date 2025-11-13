@@ -12,7 +12,7 @@ st.markdown(
 |  名称  | 英文 | 符号 | 数值 | 单位 | 公式 |
 | :---- | :----| :---| :----| :---| :---|
 | 玻尔兹曼常数 | Boltzmann constant | $k_B$ | 8.314462 | $J K^{-1}mol^{-1}$ | - | 
-| 阿伏伽德罗常数 | Avogadro constant | $N_A$ | $6.022141 \times 10^(-23)$ | $J K^{-1}mol^{-1}$ | - | 
+| 阿伏伽德罗常数 | Avogadro constant | $N_A$ | $6.022141 \\times 10^(-23)$ | $J K^{-1}mol^{-1}$ | - | 
 | 理想气体常数 | Boltzmann constant | $k_B$ | 8.31446261815324 | $J K^{-1}mol^{-1}$ | $k_B N_A$ | 
 """, unsafe_allow_html=True,)
 
