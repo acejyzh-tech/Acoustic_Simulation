@@ -13,7 +13,12 @@ st.dataframe(fr_paras)
 freqs = np.logspace(1, 5, 1000)  # 从 0.1Hz 到 100Hz
 As = []
 for data in fr_paras:
-  As.append(ac.dB(1/np.sqrt(1+(50/freqs)**2)))
+  fr = ac.dB(1/np.sqrt(1+(data[0]/freqs)**2))
+  for i in range((len(fr_paras)-1)/2):
+    z = freqs/fr_paras[i*2+1]
+    Qm = fr_paras[i*2+2]
+    fr += Qm/np.sqrt(z**2+(z**2-1)**2*Qm**2)
+  As.append(fr)
 df = pd.DataFrame({
   "freq": freqs,
   "1#": As[0],
