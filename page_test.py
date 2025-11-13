@@ -16,6 +16,6 @@ for data in fr_paras:
   As.append(ac.dB(1/np.sqrt(1+(50/freqs)**2)))
 df = pd.DataFrame({
   "freq": freqs,
-  "1#": As,
+  "1#": As[0],
 })
 st.dataframe(df)
