@@ -15,7 +15,8 @@ for row in indata:
         data.append([float(num) for num in row])
     except ValueError:
         pass
-
+N = len(data)
+st.caption(f"有效数据长度：{N}")
 freq = [row[0] for row in data]
 values = [ac.A_weight(num) for num in freq]  # 计算计权值
 if len(data[0])==1:
