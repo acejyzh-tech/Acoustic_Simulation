@@ -34,9 +34,10 @@ else:
     df = pd.DataFrame({'频率': freq, '未计权': lin,  '计权后': weighted})
     chart = alt.Chart(df).mark_line(point=True).encode(
         x=alt.X('频率:Q', title='频率 (Hz)', scale=alt.Scale(type='log')),
-        y=alt.Y('未计权:Q', title='未计权 (dB)') +
-        alt.Chart(df).mark_line(point=True).encode(
+        y=alt.Y('未计权:Q', title='未计权 (dB)')
+    ).properties(title='计权值数据')
+    chart += alt.Chart(df).mark_line(point=True).encode(
         x=alt.X('频率:Q', title='频率 (Hz)', scale=alt.Scale(type='log')),
-        y=alt.Y('计权后:Q', title='计权后 (dB)'),
+        y=alt.Y('计权后:Q', title='计权后 (dB)')
     ).properties(title='计权值数据')
 st.altair_chart(chart, use_container_width=True)
