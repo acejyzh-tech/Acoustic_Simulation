@@ -15,14 +15,24 @@ for row in indata:
         data.append([float(num) for num in row])
     except ValueError:
         pass
-if len(data[0])==1:
-    freq = [row[0] for row in data]
-    values = [ac.A_weight(num) for num in freq]  # 计算计权值
 
+freq = [row[0] for row in data]
+values = [ac.A_weight(num) for num in freq]  # 计算计权值
+if len(data[0])==1:
     df = pd.DataFrame({'频率': freq, 'A计权值': values})
     chart = alt.Chart(df).mark_line(point=True).encode(
         x=alt.X('频率:Q', title='频率 (Hz)', scale=alt.Scale(type='log')),
         y=alt.Y('A计权值:Q', title='A计权值 (dB)'),
         tooltip=['频率:Q', 'A计权值:Q']
     ).properties(title='计权值数据')
-    st.altair_chart(chart, use_container_width=True)
+    
+else:
+    lin = [row[1] for row in data]
+    weighted = [lin[i]+values[i] for i in range(len(lin))]
+    df = pd.DataFrame({'频率': freq, '未计权': lin,  '计权后': weighted})
+    chart = alt.Chart(df).mark_line(point=True).encode(
+        x=alt.X('频率:Q', title='频率 (Hz)', scale=alt.Scale(type='log')),
+        y=alt.Y('A计权值:Q', title='A计权值 (dB)'),
+        tooltip=['频率:Q', 'A计权值:Q']
+    ).properties(title='计权值数据')
+st.altair_chart(chart, use_container_width=True)
