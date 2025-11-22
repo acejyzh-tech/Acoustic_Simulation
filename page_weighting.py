@@ -7,6 +7,7 @@ freq0 = ""
 for i in range(401): freq0 += str(10**(i/100+1))+"\n"
 input_data = st.text_area("请输入你想要计算的频率点数据（每行一个频率值）", freq0)
 input_data = input_data.replace(' ', ',')
+input_data = input_data.replace('\t', ',')
 indata = input_data.split('\n')
 indata = [row.split(',') for row in indata]
 data = []
