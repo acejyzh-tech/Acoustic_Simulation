@@ -5,7 +5,7 @@ import JYAcoustic as ac
 st.header("计权数据生成", divider=True)
 freq0 = ""
 for i in range(401): freq0 += str(10**(i/100+1))+"\n"
-input_data = st.text_area("请输入你想要计算的频率点数据（每行一个频率值）", freq0)
+input_data = st.text_area("输入频率点或频谱序列。仅输入频率点时，计算该频率点对应的A计权值。输入频谱序列（以半角逗号、空格或制表符分隔）时，计算计权后的频谱曲线以及。", freq0)
 input_data = input_data.replace(' ', ',')
 input_data = input_data.replace('\t', ',')
 indata = input_data.split('\n')
