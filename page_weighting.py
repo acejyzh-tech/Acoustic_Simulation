@@ -24,7 +24,7 @@ if len(data[0])==1:
         x=alt.X('频率:Q', title='频率 (Hz)', scale=alt.Scale(type='log')),
         y=alt.Y('A计权值:Q', title='A计权值 (dB)'),
         tooltip=['频率:Q', 'A计权值:Q']
-    ).properties(title='计权值数据')
+        ).properties(title='计权值数据')
     
 else:
     lin = [row[1] for row in data]
