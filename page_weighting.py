@@ -16,7 +16,7 @@ for row in indata:
     except ValueError:
         pass
 if len(data[0])==1:
-    freq = [row[0] for row in converted_data]
+    freq = [row[0] for row in data]
     values = [ac.A_weight(num) for num in freq]  # 计算计权值
 
     df = pd.DataFrame({'频率': freq, 'A计权值': values})
